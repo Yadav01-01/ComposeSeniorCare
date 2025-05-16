@@ -1,0 +1,11 @@
+package com.bussiness.composeseniorcare.navigation
+
+object Routes {
+    const val SPLASH = "splash"
+    const val ONBOARDING = "onboarding"
+    const val LOGIN = "Login"
+    const val FORGOT_PASSWORD = "ForgotPassword"
+    const val VERIFY_OTP = "VerifyOTP"
+    const val CREATE_PASSWORD = "CreatePassword"
+    const val SIGN_UP = "SignUp"
+}
