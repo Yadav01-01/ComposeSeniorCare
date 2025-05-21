@@ -8,4 +8,10 @@ object Routes {
     const val VERIFY_OTP = "VerifyOTP"
     const val CREATE_PASSWORD = "CreatePassword"
     const val SIGN_UP = "SignUp"
+    const val HOME_SCREEN = "HomeScreen"
+    const val COMPARE_FACILITY = "CompareFacility"
+    const val SAVED_FACILITIES = "SavedFacilities"
+    const val PROFILE_SCREEN = "ProfileScreen"
+    const val MAIN_SCREEN = "MainScreen"
+
 }

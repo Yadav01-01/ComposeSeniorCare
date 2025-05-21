@@ -33,6 +33,7 @@ import com.bussiness.composeseniorcare.navigation.Routes
 import com.bussiness.composeseniorcare.ui.component.EmailOrPhoneInput
 import com.bussiness.composeseniorcare.ui.component.GoogleButtonWithIcon
 import com.bussiness.composeseniorcare.ui.component.HeadingText
+import com.bussiness.composeseniorcare.ui.component.LoginSuccessDialog
 import com.bussiness.composeseniorcare.ui.component.PasswordInput
 import com.bussiness.composeseniorcare.ui.component.SubmitButton
 import com.bussiness.composeseniorcare.ui.theme.BackColor
@@ -49,12 +50,26 @@ fun LoginScreen(
 ) {
     var input by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var showSuccessDialog by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFEAEFF1))
     ) {
+
+        if (showSuccessDialog) {
+            LoginSuccessDialog(
+                onDismiss = { showSuccessDialog = false },
+                onOkayClick = {
+                    showSuccessDialog = false
+                    navController?.navigate(Routes.MAIN_SCREEN) {
+                        popUpTo(Routes.LOGIN) { inclusive = true }
+                    }
+                }
+            )
+        }
+
         // Top image
         Image(
             painter = painterResource(id = R.drawable.bg_img),
@@ -169,7 +184,17 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(15.dp))
 
-                SubmitButton(text = "Login", onClick = onLoginClick, modifier = Modifier)
+                SubmitButton(
+                    text = "Login",
+                    onClick = {
+                        if (input.isNotBlank() && password.isNotBlank()) {
+                            showSuccessDialog = true
+                            onLoginClick()
+                        }
+                    },
+                    modifier = Modifier
+                )
+
 
                 Spacer(modifier = Modifier.height(10.dp))
 

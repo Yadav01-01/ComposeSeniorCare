@@ -6,6 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.bussiness.composeseniorcare.ui.screen.MainScreen
 import com.bussiness.composeseniorcare.ui.screen.SplashScreen
 import com.bussiness.composeseniorcare.ui.screen.authflow.CreatePasswordScreen
 import com.bussiness.composeseniorcare.ui.screen.authflow.ForgotPasswordScreen
@@ -47,6 +48,10 @@ fun NavGraph(navController: NavHostController) {
                 checked = checkedState.value,
                 onCheckedChange = { checkedState.value = it }
             )
+        }
+
+        composable(Routes.MAIN_SCREEN){
+            MainScreen(navController)
         }
 
 

@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Compose SeniorCare</string>
+    <string name="feature_provider"><font color="#000000">Featured</font> <font color="#EA5B60">Providers</font></string>
+    <string name="featured_facilities"><font color="#000000">Featured</font> <font color="#EA5B60">Facilities</font></string>
+    <string name="explore_facilities"><font color="#000000">Explore</font> <font color="#EA5B60">Facilities</font></string>
+    <string name="compare_facilty"><font color="#000000">Compare</font> <font color="#EA5B60">Facility</font></string>
+    <string name="name_of_society">Name Of Society</string>
+    <string name="provider_information">Provider Information</string>
+    <string name="floor">Floor</string>
+    <string name="status">Status</string>
+    <string name="furnished_status">Furnished Status</string>
+    <string name="year_built">Year Built</string>
+    <string name="garage">Garage</string>
+    <string name="overview">Overview</string>
+    <string name="amenities">Amenities</string>
 </resources>

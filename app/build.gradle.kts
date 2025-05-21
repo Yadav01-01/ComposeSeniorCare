@@ -63,6 +63,13 @@ dependencies {
     implementation (libs.androidx.material.icons.extended)
     //material3
     implementation(libs.material3)
+    //carousel
+    implementation(libs.androidx.foundation)
+    implementation(libs.ui)
+    //coil (image loading)
+    implementation(libs.coil.compose)
+
+
 
 
 
