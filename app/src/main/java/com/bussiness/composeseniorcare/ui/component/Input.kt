@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -365,8 +367,67 @@ fun CompareFacilityCard(
 }
 
 
+@Composable
+fun SharpEdgeButton(buttonText : String, onClickButton : () -> Unit,buttonTextSize : Int = 12){
+    Button(
+        onClick = onClickButton,
+        modifier = Modifier
+            .height(35.dp)
+            .padding(start = 9.dp, end = 9.dp),
+        colors = ButtonDefaults.buttonColors(
+            Purple,
+            contentColor = Color.White
+        ),
+        shape = RoundedCornerShape(17.dp),
+        elevation = ButtonDefaults.buttonElevation(4.dp)
+    ) {
+        Text(
+            text = buttonText,
+            fontFamily = FontFamily(Font(R.font.poppins)),
+            fontSize = buttonTextSize.sp,
+            textAlign = TextAlign.Center
+        )
+    }
+}
 
+@Composable
+fun TopHeadingText(
+    text: String,
+    modifier: Modifier = Modifier,
+    onBackPress: () -> Unit
+) {
+    Spacer(Modifier.height(10.dp))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Transparent)
+            .wrapContentHeight()
+            .padding(vertical = 12.dp, horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.back_ic),
+            contentDescription = "Back icon",
+            modifier = Modifier
+                .wrapContentSize()
+                .clickable { onBackPress() }
+        )
 
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Text(
+            text = text,
+            fontSize = 20.sp,
+            fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            textAlign = TextAlign.Center,
+            modifier = modifier
+                .weight(1f)
+                .align(Alignment.CenterVertically)
+        )
+    }
+}
 
 
 

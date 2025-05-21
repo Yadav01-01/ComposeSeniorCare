@@ -311,13 +311,29 @@ fun FacilityCard(
             FacilityTitleText("Services : " , facility.services)
             Spacer(modifier = Modifier.height(4.dp))
 
-            Text(
-                text = "From : " +facility.price,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
-                color = Color(0xFFEA5B60)
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = "From : " +facility.price,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
+                    color = Color(0xFFEA5B60)
+                )
+
+                Icon(
+                    painter = painterResource(R.drawable.arrow_ic),
+                    contentDescription = "arrow icon",
+                    Modifier.wrapContentSize()
+                )
+
+
+
+            }
         }
     }
 }

@@ -67,7 +67,7 @@ val facilities = List(5) {
     PosterItem(R.drawable.poster,"Assisted Living", "Lorem ipsum dolor sit amet, consectetur adipiscing elit")
 }
 
-private val facilitiesList = List(2) {
+val facilitiesList = List(2) {
     Facility(
         imageResId = R.drawable.banner_bg, // Replace with a valid drawable
         name = "Lorem ipsum",
@@ -378,7 +378,8 @@ fun FacilityCard(
     onBookmarkClick: ((Facility) -> Unit)? = null,
     onCardClick: ((Facility) -> Unit)? = null,
     cornerRadius: Dp = 12.dp,
-    cardElevation: Dp = 4.dp
+    cardElevation: Dp = 4.dp,
+    fromTextColor : Color
 ) {
     Column(
         modifier = modifier
@@ -398,58 +399,58 @@ fun FacilityCard(
                     painter = painterResource(id = facility.imageResId),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-
-                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top
-                ) {
-                    if (showRating) {
-                        Surface(
-                            color = Color.White,
-                            shape = RoundedCornerShape(5.dp),
-                            shadowElevation = 2.dp
+                        .height(160.dp)
+                )
+
+                // Rating (if shown)
+                if (showRating) {
+                    Surface(
+                        color = Color.White,
+                        shape = RoundedCornerShape(5.dp),
+                        shadowElevation = 2.dp,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .align(Alignment.TopStart)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                            ) {
-                                Text(
-                                    text = facility.rating,
-                                    color = Color.Black,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 14.sp,
-                                    fontFamily = FontFamily(Font(R.font.poppins_semi_bold))
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Icon(
-                                    painter = painterResource(id = R.drawable.star1),
-                                    contentDescription = "star icon",
-                                    modifier = Modifier.wrapContentSize(),
-                                    tint = Color.Unspecified
-                                )
-                            }
+                            Text(
+                                text = facility.rating,
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                fontFamily = FontFamily(Font(R.font.poppins_semi_bold))
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Icon(
+                                painter = painterResource(id = R.drawable.star1),
+                                contentDescription = "star icon",
+                                tint = Color.Unspecified
+                            )
                         }
                     }
+                }
 
-                    if (showBookmark) {
-                        Icon(
-                            painter = painterResource(
-                                id = if (facility.isBookmarked) R.drawable.select_bm else R.drawable.bookmark_
-                            ),
-                            contentDescription = "Bookmark",
-                            modifier = Modifier
-                                .wrapContentSize()
-                                .clickable { onBookmarkClick?.invoke(facility) },
-                            tint = Color.Unspecified
-                        )
-                    }
+                // Bookmark (always topEnd if shown)
+                if (showBookmark) {
+                    Icon(
+                        painter = painterResource(
+                            id = if (facility.isBookmarked) R.drawable.select_bm else R.drawable.bookmark_
+                        ),
+                        contentDescription = "Bookmark",
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .align(Alignment.TopEnd)
+                            .clickable { onBookmarkClick?.invoke(facility) },
+                        tint = Color.Unspecified
+                    )
                 }
             }
+
         }
 
         Column(modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)) {
@@ -460,13 +461,26 @@ fun FacilityCard(
             FacilityTitleText("Services : " , facility.services)
             Spacer(modifier = Modifier.height(4.dp))
 
-            Text(
-                text = "From : " +facility.price,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
-                color = Color(0xFFEA5B60)
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = "From : " +facility.price,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
+                    color = Color(0xFFEA5B60)
+                )
+
+                Icon(
+                    painter = painterResource(R.drawable.arrow_ic),
+                    contentDescription = "arrow icon",
+                    Modifier.wrapContentSize()
+                )
+            }
         }
     }
 }
@@ -477,7 +491,7 @@ fun FacilityCard(
 fun FacilityList(facilities: List<Facility>) {
     LazyColumn {
         items(facilities) { facility ->
-            FacilityCard(facility = facility)
+            FacilityCard(facility = facility, fromTextColor = Color(0xFFEA5B60))
         }
     }
 }

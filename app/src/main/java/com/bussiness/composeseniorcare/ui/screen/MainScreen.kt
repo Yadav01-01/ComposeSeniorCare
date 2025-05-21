@@ -10,6 +10,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.bussiness.composeseniorcare.navigation.BottomNavGraph
 import com.bussiness.composeseniorcare.ui.component.CustomBottomBar
 import com.bussiness.composeseniorcare.ui.component.bottomNavItems
+import com.bussiness.composeseniorcare.ui.component.savedFacilities
 
 @Composable
 fun MainScreen(navController: NavHostController) {
@@ -36,7 +37,7 @@ fun MainScreen(navController: NavHostController) {
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            BottomNavGraph(navController = navController)
+            BottomNavGraph(navController = navController,savedFacilities)
         }
     }
 }

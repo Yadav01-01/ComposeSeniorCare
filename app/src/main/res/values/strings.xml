@@ -13,4 +13,5 @@
     <string name="garage">Garage</string>
     <string name="overview">Overview</string>
     <string name="amenities">Amenities</string>
+    <string name="saved_featured_facilities"><font color="#000000">Saved Featured</font> <font color="#EA5B60">Facilities</font></string>
 </resources>

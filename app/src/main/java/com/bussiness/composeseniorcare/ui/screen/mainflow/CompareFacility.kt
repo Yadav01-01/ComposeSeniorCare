@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -43,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.bussiness.composeseniorcare.R
+import com.bussiness.composeseniorcare.data.model.Facility
 import com.bussiness.composeseniorcare.ui.theme.Purple
 
 @Composable
@@ -119,6 +123,9 @@ fun CompareFacilities(navController: NavHostController) {
                     onDownload2Click = { /* download PDF 2 */ }
                 )
 
+                Spacer(Modifier.height(15.dp))
+
+                FeaturedFacilityList(facilitiesList)
 
             }
         }
@@ -322,6 +329,16 @@ fun FacilityTitleText(boldHeading : String , text : String){
     }
 }
 
+@Composable
+fun FeaturedFacilityList(facilities: List<Facility>) {
+    LazyColumn {
+        items(facilities) { facility ->
+            FacilityCard(facility = facility, showRating = false,
+                showBookmark = true, onBookmarkClick = { /*...*/ }, onCardClick = { }, fromTextColor = Purple
+            )
+        }
+    }
+}
 
 
 
