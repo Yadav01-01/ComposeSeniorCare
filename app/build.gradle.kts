@@ -68,6 +68,10 @@ dependencies {
     implementation(libs.ui)
     //coil (image loading)
     implementation(libs.coil.compose)
+    // Pager (Accompanist)
+    implementation (libs.accompanist.pager.v0360)
+    implementation (libs.accompanist.pager.indicators.v0360)
+
 
 
 

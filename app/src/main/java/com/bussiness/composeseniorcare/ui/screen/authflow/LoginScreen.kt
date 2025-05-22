@@ -42,7 +42,7 @@ import com.bussiness.composeseniorcare.ui.theme.Purple
 
 @Composable
 fun LoginScreen(
-    navController: NavHostController? = null,
+    navController: NavHostController,
     onLoginClick: () -> Unit = {},
     onSignUpClick: () -> Unit = { navController?.navigate(Routes.SIGN_UP) },
     onForgotPasswordClick: () -> Unit = { navController?.navigate(Routes.FORGOT_PASSWORD) },
@@ -63,12 +63,13 @@ fun LoginScreen(
                 onDismiss = { showSuccessDialog = false },
                 onOkayClick = {
                     showSuccessDialog = false
-                    navController?.navigate(Routes.MAIN_SCREEN) {
+                    navController.navigate(Routes.MAIN_SCREEN) {
                         popUpTo(Routes.LOGIN) { inclusive = true }
                     }
                 }
             )
         }
+
 
         // Top image
         Image(

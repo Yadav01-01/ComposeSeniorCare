@@ -16,7 +16,7 @@ fun BottomNavGraph(
     navController: NavHostController,
     savedFacilities: List<Facility>
 ) {
-    NavHost(navController, startDestination = Routes.HOME_SCREEN) {
+    NavHost(navController, startDestination = Routes.PROFILE_SCREEN) {
         composable(Routes.HOME_SCREEN) { HomeScreen(navController) }
         composable(Routes.COMPARE_FACILITY) { CompareFacilities(navController) }
         composable(Routes.SAVED_FACILITIES) { SavedFacilities(navController,savedFacilities) }

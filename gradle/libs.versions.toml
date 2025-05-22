@@ -1,4 +1,7 @@
 [versions]
+accompanistPager = "0.36.0"
+accompanistPagerIndicators = "0.31.5-beta"
+accompanistPagerIndicatorsVersion = "0.36.0"
 activityComposeVersion = "1.8.0"
 agp = "8.9.0"
 coilCompose = "2.4.0"
@@ -19,6 +22,10 @@ ui = "1.8.1"
 animationCoreLint = "1.8.1"
 
 [libraries]
+accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPagerIndicators" }
+accompanist-pager-indicators = { module = "com.google.accompanist:accompanist-pager-indicators", version.ref = "accompanistPagerIndicators" }
+accompanist-pager-indicators-v0360 = { module = "com.google.accompanist:accompanist-pager-indicators", version.ref = "accompanistPagerIndicatorsVersion" }
+accompanist-pager-v0360 = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
 androidx-activity-compose-v180 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "foundation" }

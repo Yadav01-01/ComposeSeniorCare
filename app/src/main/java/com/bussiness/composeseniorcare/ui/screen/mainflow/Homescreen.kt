@@ -75,7 +75,7 @@ val facilitiesList = List(2) {
         services = "Assisted Living, Memory Care",
         price = "$25.9",
         rating = "4.8",
-        isBookmarked = true
+        isBookmarked = false
     )
 }
 
@@ -90,60 +90,57 @@ private val featuredFacilityList = List(2) {
     )
 }
 
-
-
-
 @Composable
-fun HomeScreen(navController: NavHostController) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFFFFFFF),
-                        Color(0xFF5C2C4D),
-                        Color(0xFF5C2C4D)
-                    )
-                )
-            )
-    ) {
-        CustomTopAppBar()
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
-                .background(Color.White)
-
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 20.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.Top
-            ) {
-                SearchBar()
-                Spacer(modifier = Modifier.height(15.dp))
-                BannerSection()
-                Spacer(modifier = Modifier.height(15.dp))
-                ExploreFacilitiesSection(facilities)
-                Spacer(modifier = Modifier.height(15.dp))
-                FacilityList(facilitiesList)
-                Spacer(modifier = Modifier.height(15.dp))
-                FeaturedProvidersSection(providers = featuredFacilityList){ selectedProvider ->
-
-                }
-
-
-            }
-        }
+fun HomeScreen(navController: NavHostController){
+    Column (Modifier.fillMaxSize().background(Color.White)){
+        Text("Home Screen")
     }
 }
 
 @Composable
+//fun HomeScreen(navController: NavHostController) {
+//    Box(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(
+//                Brush.verticalGradient(
+//                    colors = listOf(
+//                        Color(0xFFFFFFFF),
+//                        Color(0xFF5C2C4D),
+//                        Color(0xFF5C2C4D)
+//                    )
+//                )
+//            )
+//    ) {
+//        CustomTopAppBar()
+//
+//        Box(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .fillMaxHeight(0.85f)
+//                .align(Alignment.BottomCenter)
+//                .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
+//                .background(Color.White)
+//        ) {
+//            LazyColumn(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(horizontal = 20.dp, vertical = 15.dp),
+//                verticalArrangement = Arrangement.spacedBy(15.dp)
+//            ) {
+//                item { SearchBar() }
+//                item { BannerSection() }
+//                item { ExploreFacilitiesSection(facilities) }
+//                item { FacilityList(facilitiesList) }
+//                item {
+//                    FeaturedProvidersSection(providers = featuredFacilityList) { selectedProvider ->
+//                        // Handle click here
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 fun CustomTopAppBar(showCredit: Boolean = true) {
     val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
 
@@ -230,7 +227,7 @@ fun CreditsText(modifier: Modifier = Modifier) {
 fun SearchBar() {
     Row(
         modifier = Modifier
-            .padding(top = 20.dp)
+            .padding(top = 5.dp)
             .fillMaxWidth()
             .height(48.dp)
             .clip(RoundedCornerShape(10.dp))
@@ -455,11 +452,11 @@ fun FacilityCard(
 
         Column(modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)) {
             FacilityTextHeading(facility.name)
-            Spacer(modifier = Modifier.height(4.dp))
+//            Spacer(modifier = Modifier.height(2.dp))
             FacilityTitleText("Location : " , facility.location)
-            Spacer(modifier = Modifier.height(4.dp))
+//            Spacer(modifier = Modifier.height(2.dp))
             FacilityTitleText("Services : " , facility.services)
-            Spacer(modifier = Modifier.height(4.dp))
+//            Spacer(modifier = Modifier.height(2.dp))
 
             Row(
                 modifier = Modifier
@@ -469,7 +466,7 @@ fun FacilityCard(
             ) {
                 Text(
                     text = "From : " +facility.price,
-                    fontSize = 16.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
                     color = Color(0xFFEA5B60)

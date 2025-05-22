@@ -300,7 +300,7 @@ fun DownloadButtonRow(
 fun FacilityTextHeading(text : String){
     Text(
         text = text,
-        fontSize = 16.sp,
+        fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
         fontFamily = FontFamily(Font(R.font.poppins)),
         color = Purple,
@@ -314,7 +314,7 @@ fun FacilityTitleText(boldHeading : String , text : String){
     Row(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = boldHeading,
-            fontSize = 16.sp,
+            fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
             color = Purple,
@@ -322,7 +322,7 @@ fun FacilityTitleText(boldHeading : String , text : String){
 
         Text(
             text = text,
-            fontSize = 16.sp,
+            fontSize = 12.sp,
             fontWeight = FontWeight.Normal,
             fontFamily = FontFamily(Font(R.font.poppins)),
         )

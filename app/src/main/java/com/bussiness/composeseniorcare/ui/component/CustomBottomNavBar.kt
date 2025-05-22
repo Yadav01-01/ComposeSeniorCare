@@ -58,46 +58,50 @@ fun CustomBottomBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
             items.forEach { item ->
                 val selected = item.route == selectedRoute
+
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
+                        .weight(1f) // Evenly distribute based on screen width
                         .clickable { onItemClick(item) }
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                        .padding(vertical = 6.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(42.dp)
+                            .size(40.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(if (selected) Color(0xFF5C2C4D) else Color.Transparent),
+                            .background(
+                                if (selected) Color(0xFF5C2C4D) else Color.Transparent
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             painter = painterResource(id = item.icon),
                             contentDescription = item.label,
                             tint = if (selected) Color.White else Color(0xFF303030),
-                            modifier = Modifier.size(30.dp) // Icon size inside the box
+                            modifier = Modifier.size(24.dp)
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
+
                     Text(
                         text = item.label,
-                        color = Color.Black,
-                        fontSize = 12.sp,
+                        color = if (selected) Color(0xFF5C2C4D) else Color(0xFF303030),
+                        fontSize = 11.sp,
                         fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
-                        fontWeight = FontWeight.Bold
+                        maxLines = 1
                     )
                 }
             }
         }
     }
 }
+
 
 
 @Preview(showBackground = true)

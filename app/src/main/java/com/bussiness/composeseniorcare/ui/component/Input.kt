@@ -210,7 +210,8 @@ fun SubmitButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     backgroundColor: Color = Purple,
-    textColor: Color = Color.White
+    textColor: Color = Color.White,
+    fontSize: Int = 16
 ) {
     Button(
         onClick = onClick,
