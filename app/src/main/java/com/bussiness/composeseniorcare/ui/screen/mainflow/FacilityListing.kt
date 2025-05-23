@@ -34,10 +34,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,6 +49,8 @@ import androidx.navigation.compose.rememberNavController
 import com.bussiness.composeseniorcare.R
 import com.bussiness.composeseniorcare.data.model.Facility
 import com.bussiness.composeseniorcare.ui.component.SharpEdgeButton
+import com.bussiness.composeseniorcare.ui.theme.Purple
+import com.bussiness.composeseniorcare.ui.theme.Readish
 
 @Composable
 fun FacilityListing(navController: NavHostController) {
@@ -70,48 +75,86 @@ fun FacilityListing(navController: NavHostController) {
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
                 .background(Color.White)
-
         ) {
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 20.dp)
-                    .background(color = Color.White)
-                    .verticalScroll(rememberScrollState()),
+                    .padding(horizontal = 20.dp),
                 verticalArrangement = Arrangement.Top
             ) {
-                SearchBarWithFilter(onClickFilter = { }, onClickSearch = { })
-                Spacer(modifier = Modifier.height(15.dp))
-                MapBox()
-                Spacer(modifier = Modifier.height(10.dp))
-                Text("Facilities",
-                    fontSize = 24.sp,
-                    fontFamily = FontFamily(Font(R.font.poppins)),
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFFEA5B60),)
-                Spacer(modifier = Modifier.height(10.dp))
-                FacilityView(facilitiesList)
-                Spacer(modifier = Modifier.height(10.dp))
-                Text("Exclusive Offers",
-                    fontSize = 24.sp,
-                    fontFamily = FontFamily(Font(R.font.poppins)),
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFFEA5B60),
-                    textAlign = TextAlign.Center)
-                Text("Lorem ipsum dolor sit amet consectetur. Orci\n malesuada mi et mi pellentesque tincidunt at mollis\n facilisis. Nisl eu blandit nunc parturient adipiscing\n commodo.",
-                    fontSize = 14.sp,
-                    fontFamily = FontFamily(Font(R.font.poppins)),
-                    fontWeight = FontWeight.Normal,
-                    color = Color(0xFF535353),
-                    textAlign = TextAlign.Center)
-                Spacer(modifier = Modifier.height(10.dp))
-                SharpEdgeButton("Join Now !", onClickButton = { }, buttonTextSize = 14)
+                item {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    SearchBarWithFilter(onClickFilter = { }, onClickSearch = { })
+                    Spacer(modifier = Modifier.height(15.dp))
+                    MapBox()
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        "Facilities",
+                        fontSize = 24.sp,
+                        fontFamily = FontFamily(Font(R.font.poppins)),
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFEA5B60)
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
 
+                items(facilitiesList) { facility ->
+                    FacilityCard(
+                        facility = facility,
+                        showRating = true,
+                        showBookmark = true,
+                        onBookmarkClick = { },
+                        onCardClick = { },
+                        fromTextColor = Color(0xFFEA5B60)
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+
+                item {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Text(text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(color = Color.Black, fontWeight = FontWeight.Bold)) {
+                                append("Exclusive ")
+                            }
+                            withStyle(style = SpanStyle(color = Readish, fontWeight = FontWeight.Bold)) {
+                                append("Offers")
+                            }
+                        },
+                            fontSize = 24.sp,
+                            fontFamily = FontFamily(Font(R.font.poppins)),
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFEA5B60),
+                            textAlign = TextAlign.Center
+                        )
+
+                        Text(
+                            "Lorem ipsum dolor sit amet consectetur. Orci malesuada mietmi pellentesque tincidunt at mollis facilisis. Nisl eu blandit nunc parturient adipiscing commodo.",
+                            fontSize = 12.sp,
+                            fontFamily = FontFamily(Font(R.font.poppins)),
+                            fontWeight = FontWeight.Normal,
+                            color = Color(0xFF535353),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        SharpEdgeButton("Join Now !", onClickButton = { }, buttonTextSize = 14)
+
+                        Spacer(modifier = Modifier.height(20.dp))
+                    }
+                }
 
             }
         }
     }
 }
+
 
 @Composable
 fun SearchBarWithFilter(
@@ -195,14 +238,9 @@ fun MapBox(){
     }
 }
 
-@Composable
-fun FacilityView(facilities: List<Facility>) {
-    LazyColumn {
-        items(facilities) { facility ->
-            FacilityCard(facility = facility, fromTextColor = Color(0xFFEA5B60))
-        }
-    }
-}
+
+
+
 
 @Preview(showBackground = true)
 @Composable

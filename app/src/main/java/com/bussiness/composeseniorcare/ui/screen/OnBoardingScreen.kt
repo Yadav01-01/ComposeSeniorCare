@@ -57,7 +57,7 @@ fun OnboardingScreen() {
             OnboardingCard(onboardingItems[page])
         }
 
-        OnboardingPagerIndicator(pagerState)
+//        CustomPagerIndicator(pagerState)
     }
 }
 

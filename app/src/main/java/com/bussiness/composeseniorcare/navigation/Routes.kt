@@ -13,5 +13,7 @@ object Routes {
     const val SAVED_FACILITIES = "SavedFacilities"
     const val PROFILE_SCREEN = "ProfileScreen"
     const val MAIN_SCREEN = "MainScreen"
+    const val FACILITY_LISTING = "FacilityListing"
+    const val LISTING_DETAIL = "FacilityDetail"
 
 }

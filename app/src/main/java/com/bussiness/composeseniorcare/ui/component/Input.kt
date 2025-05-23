@@ -90,7 +90,7 @@ fun EmailOrPhoneInput(
         trailingIcon = {
             if (isError) {
                 Image(
-                    painter = painterResource(id = R.drawable.mail_ic_),
+                    painter = painterResource(id = R.drawable.home_icon),
                     contentDescription = "Error",
                 )
             }
@@ -228,7 +228,7 @@ fun SubmitButton(
             text = text,
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
-            fontFamily = Poppins
+            fontFamily = FontFamily(Font(R.font.poppins)),
         )
     }
 }
@@ -379,7 +379,7 @@ fun SharpEdgeButton(buttonText : String, onClickButton : () -> Unit,buttonTextSi
             Purple,
             contentColor = Color.White
         ),
-        shape = RoundedCornerShape(17.dp),
+        shape = RoundedCornerShape(5.dp),
         elevation = ButtonDefaults.buttonElevation(4.dp)
     ) {
         Text(

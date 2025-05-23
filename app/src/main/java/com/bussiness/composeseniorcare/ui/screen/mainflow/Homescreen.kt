@@ -7,14 +7,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -24,9 +27,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
@@ -37,6 +39,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,11 +51,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -61,7 +72,9 @@ import com.bussiness.composeseniorcare.R
 import com.bussiness.composeseniorcare.data.model.Facility
 import com.bussiness.composeseniorcare.data.model.PosterItem
 import com.bussiness.composeseniorcare.data.model.Provider
+import com.bussiness.composeseniorcare.navigation.Routes
 import com.bussiness.composeseniorcare.ui.theme.Purple
+import com.bussiness.composeseniorcare.ui.theme.Readish
 
 val facilities = List(5) {
     PosterItem(R.drawable.poster,"Assisted Living", "Lorem ipsum dolor sit amet, consectetur adipiscing elit")
@@ -90,57 +103,91 @@ private val featuredFacilityList = List(2) {
     )
 }
 
+
+
 @Composable
-fun HomeScreen(navController: NavHostController){
-    Column (Modifier.fillMaxSize().background(Color.White)){
-        Text("Home Screen")
+fun HomeScreen(navController: NavHostController) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFFFFFFF),
+                        Color(0xFF5C2C4D),
+                        Color(0xFF5C2C4D)
+                    )
+                )
+            )
+    ) {
+        CustomTopAppBar()
+
+        // Main content
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
+                .background(Color.White)
+                .padding(horizontal = 15.dp, vertical = 15.dp),
+            verticalArrangement = Arrangement.spacedBy(15.dp)
+        ) {
+            item { SearchBar() }
+            item { BannerSection() }
+            item { ExploreFacilitiesSection(facilities) }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(color = Color.Black, fontWeight = FontWeight.Bold)) {
+                                append("Featured ")
+                            }
+                            withStyle(style = SpanStyle(color = Readish, fontWeight = FontWeight.Bold)) {
+                                append("Facilities")
+                            }
+                        },
+                        fontSize = 24.sp,
+                        fontFamily = FontFamily(Font(R.font.poppins_semi_bold))
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Text(
+                        text = "See all+",
+                        textDecoration = TextDecoration.Underline,
+                        fontSize = 10.sp,
+                        color = Color.Black,
+                        fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
+                        modifier = Modifier.clickable {
+                            navController.navigate(Routes.FACILITY_LISTING)
+                        }
+                    )
+                }
+            }
+            item {
+                FeaturedFacilityList(
+                    facilities = facilitiesList,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 300.dp)
+                )
+            }
+            item {
+                FeaturedProvidersSection(
+                    providers = featuredFacilityList,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 300.dp), onProfileClick = { })
+            }
+
+        }
     }
 }
 
+
 @Composable
-//fun HomeScreen(navController: NavHostController) {
-//    Box(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(
-//                Brush.verticalGradient(
-//                    colors = listOf(
-//                        Color(0xFFFFFFFF),
-//                        Color(0xFF5C2C4D),
-//                        Color(0xFF5C2C4D)
-//                    )
-//                )
-//            )
-//    ) {
-//        CustomTopAppBar()
-//
-//        Box(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .fillMaxHeight(0.85f)
-//                .align(Alignment.BottomCenter)
-//                .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
-//                .background(Color.White)
-//        ) {
-//            LazyColumn(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(horizontal = 20.dp, vertical = 15.dp),
-//                verticalArrangement = Arrangement.spacedBy(15.dp)
-//            ) {
-//                item { SearchBar() }
-//                item { BannerSection() }
-//                item { ExploreFacilitiesSection(facilities) }
-//                item { FacilityList(facilitiesList) }
-//                item {
-//                    FeaturedProvidersSection(providers = featuredFacilityList) { selectedProvider ->
-//                        // Handle click here
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
 fun CustomTopAppBar(showCredit: Boolean = true) {
     val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
 
@@ -225,6 +272,8 @@ fun CreditsText(modifier: Modifier = Modifier) {
 
 @Composable
 fun SearchBar() {
+    var searchText by remember { mutableStateOf("") }
+
     Row(
         modifier = Modifier
             .padding(top = 5.dp)
@@ -246,20 +295,41 @@ fun SearchBar() {
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        Text(
-            text = "Search for location",
-            color = Color(0xFF333333),
-            fontSize = 14.sp,
-            fontFamily = FontFamily(Font(R.font.poppins))
-        )
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            BasicTextField(
+                value = searchText,
+                onValueChange = { searchText = it },
+                singleLine = true,
+                textStyle = TextStyle(
+                    color = Color(0xFF333333),
+                    fontSize = 14.sp,
+                    fontFamily = FontFamily(Font(R.font.poppins))
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp)
+            )
 
-        Spacer(modifier = Modifier.weight(1f))
+            if (searchText.isEmpty()) {
+                Text(
+                    text = "Search for location",
+                    color = Color.Gray,
+                    fontSize = 14.sp,
+                    fontFamily = FontFamily(Font(R.font.poppins))
+                )
+            }
+        }
 
         Box(
             modifier = Modifier
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp))
-                .background(Color(0xFF5C2C4D)) // Purple color
+                .background(Color(0xFF5C2C4D))
                 .padding(horizontal = 16.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -308,11 +378,18 @@ fun BannerSection() {
 fun ExploreFacilitiesSection(facilities: List<PosterItem>) {
     Column(modifier = Modifier) {
         Text(
-            text = "Explore Facilities",
-            fontWeight = FontWeight.Bold,
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(color = Color.Black, fontWeight = FontWeight.Bold)) {
+                    append("Explore ")
+                }
+                withStyle(style = SpanStyle(color = Readish, fontWeight = FontWeight.Bold)) {
+                    append("Facilities")
+                }
+            },
             fontSize = 24.sp,
-            fontFamily = FontFamily(Font(R.font.poppins_bold))
+            fontFamily = FontFamily(Font(R.font.poppins_semi_bold))
         )
+
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -483,25 +560,24 @@ fun FacilityCard(
 }
 
 
-// 3. FacilityList Composable
-@Composable
-fun FacilityList(facilities: List<Facility>) {
-    LazyColumn {
-        items(facilities) { facility ->
-            FacilityCard(facility = facility, fromTextColor = Color(0xFFEA5B60))
-        }
-    }
-}
 
 
 @Composable
 fun FeaturedProvidersSection(
     providers: List<Provider>,
-    onProfileClick: (Provider) -> Unit
+    onProfileClick: (Provider) -> Unit,
+    modifier: Modifier
 ) {
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(modifier) {
         Text(
-            text = stringResource(id = R.string.feature_provider),
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(color = Color.Black, fontWeight = FontWeight.Bold)) {
+                    append("Featured ")
+                }
+                withStyle(style = SpanStyle(color = Readish, fontWeight = FontWeight.Bold)) {
+                    append("Providers")
+                }
+            },
             fontFamily = FontFamily(Font(R.font.poppins_bold)),
             fontSize = 24.sp,
             color = Color.Black
@@ -510,7 +586,7 @@ fun FeaturedProvidersSection(
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
             items(providers) { provider ->
                 ProviderCard(
@@ -532,29 +608,32 @@ fun ProviderCard(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(5.dp),
+            .height(150.dp) // Fixed height for both image and content
+            .padding(horizontal = 0.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Profile Image
         AsyncImage(
             model = provider.imageUrl,
+            error = painterResource(id = R.drawable.image_ic_fet),
             contentDescription = null,
             modifier = Modifier
-                .size(120.dp)
+                .size(150.dp) // Fixed size
                 .clip(RoundedCornerShape(5.dp)),
             contentScale = ContentScale.Crop
         )
 
-        Spacer(modifier = Modifier.width(5.dp))
+        Spacer(modifier = Modifier.width(6.dp))
 
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(end = 8.dp)
+                .fillMaxHeight(), // Match height of the row/image
+            verticalArrangement = Arrangement.SpaceBetween // Even spacing inside
         ) {
             Text(
                 text = provider.name,
-                fontSize = 12.sp,
+                fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily(Font(R.font.poppins_bold)),
                 color = Purple,
@@ -564,75 +643,24 @@ fun ProviderCard(
 
             Text(
                 text = provider.description,
-                fontSize = 11.sp,
+                fontSize = 9.sp,
+                fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
                 color = Color(0xFF535353),
                 maxLines = 2,
+                lineHeight = 11.sp,
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(modifier = Modifier.height(2.dp))
+            InfoRow(label = "Location:", value = provider.location)
+            InfoRow(label = "Services:", value = provider.services)
+            InfoRow(label = "Website:", value = provider.website)
 
-            // Location
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "Location:",
-                    fontSize = 12.sp,
-                    color = Purple,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(modifier = Modifier.width(2.dp))
-                Text(
-                    text = provider.location,
-                    fontSize = 11.sp,
-                    color = Color(0xFF535353)
-                )
-            }
-
-            // Services
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "Services:",
-                    fontSize = 13.sp,
-                    color = Purple,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(modifier = Modifier.width(2.dp))
-                Text(
-                    text = provider.services,
-                    fontSize = 11.sp,
-                    color = Color(0xFF535353),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-
-            // Website
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "Website:",
-                    fontSize = 13.sp,
-                    color = Purple,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(modifier = Modifier.width(2.dp))
-                Text(
-                    text = provider.website,
-                    fontSize = 11.sp,
-                    color = Color(0xFF535353),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // View Profile Button
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(28.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(color = Purple)
+                    .height(25.dp)
+                    .clip(RoundedCornerShape(3.dp))
+                    .background(Purple)
                     .clickable { onProfileClick() },
                 contentAlignment = Alignment.Center
             ) {
@@ -640,25 +668,57 @@ fun ProviderCard(
                     text = "View Profile",
                     color = Color.White,
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = FontFamily(Font(R.font.poppins_semi_bold))
                 )
             }
         }
 
-        // Call Icon
         IconButton(
             onClick = onCallClick,
             modifier = Modifier
-                .wrapContentSize()
+                .size(28.dp)
+                .padding(start = 4.dp)
                 .align(Alignment.Top)
         ) {
             Image(
                 painter = painterResource(id = R.drawable.phone_ic),
-                contentDescription = "Call",
+                contentDescription = "Call"
             )
         }
     }
 }
+
+@Composable
+fun InfoRow(label: String, value: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = label,
+            fontSize = 9.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = Purple,
+            lineHeight = 15.sp,
+            maxLines = 1,
+            fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.width(2.dp))
+        Text(
+            text = value,
+            fontSize = 9.sp,
+            lineHeight = 15.sp,
+            color = Color(0xFF535353),
+            fontFamily = FontFamily(Font(R.font.poppins)),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+
 
 
 @Preview(showBackground = true, showSystemUi = true)

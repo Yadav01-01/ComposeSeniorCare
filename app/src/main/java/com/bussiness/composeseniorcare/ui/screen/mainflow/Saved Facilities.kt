@@ -23,6 +23,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.bussiness.composeseniorcare.R
 import com.bussiness.composeseniorcare.data.model.Facility
+import com.bussiness.composeseniorcare.navigation.Routes
 import com.bussiness.composeseniorcare.ui.theme.Purple
 
 @Composable
@@ -51,34 +52,41 @@ fun SavedFacilities(
                 .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
                 .background(Color.White)
         ) {
-            LazyColumn(
-                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
-                item {
-                    Text(
-                        text = stringResource(id = R.string.saved_featured_facilities),
-                        fontSize = 24.sp,
-                        fontFamily = FontFamily(Font(R.font.poppins)),
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                }
+                Text(
+                    text = stringResource(id = R.string.saved_featured_facilities),
+                    fontSize = 24.sp,
+                    fontFamily = FontFamily(Font(R.font.poppins)),
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
 
-                items(facilities) { facility ->
-                    FacilityCard(
-                        facility = facility,
-                        showRating = false,
-                        showBookmark = true,
-                        onBookmarkClick = { /* handle bookmark click */ },
-                        onCardClick = { /* handle card click */ },
-                        fromTextColor = Purple
-                    )
+                Spacer(Modifier.height(10.dp))
+
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(facilities) { facility ->
+                        FacilityCard(
+                            facility = facility,
+                            showRating = false,
+                            showBookmark = true,
+                            onBookmarkClick = { /* handle bookmark click */ },
+                            onCardClick = { navController.navigate(Routes.LISTING_DETAIL) },
+                            fromTextColor = Purple
+                        )
+                    }
                 }
             }
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
@@ -90,5 +98,4 @@ fun SavedFacilitiesScreenPreview() {
             facilities = facilitiesList // replace with preview list
         )
     }
-
 }

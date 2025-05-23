@@ -14,8 +14,11 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -35,10 +38,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -50,12 +55,11 @@ import com.bussiness.composeseniorcare.data.model.Facility
 import com.bussiness.composeseniorcare.ui.theme.Purple
 
 @Composable
-
 fun CompareFacilities(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding( WindowInsets.statusBars.asPaddingValues())
+            .padding(WindowInsets.statusBars.asPaddingValues())
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
@@ -68,69 +72,103 @@ fun CompareFacilities(navController: NavHostController) {
     ) {
         CustomTopAppBar(showCredit = false)
 
+        // Bounded container
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
+                .fillMaxSize()
                 .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
                 .background(Color.White)
-
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 15.dp, vertical = 15.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.Top
+            LazyColumn(
+                contentPadding = PaddingValues(horizontal = 0.dp, vertical = 0.dp),
+                verticalArrangement = Arrangement.Top,
+                modifier = Modifier.fillMaxSize()
             ) {
+                item {
+                    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp, vertical = 15.dp)) {
+                        CompareCard(
+                            imageRes = R.drawable.genac_ic,
+                            onChangeClick = { /*...*/ },
+                            modifier = Modifier.weight(1f)
+                        )
+                        CompareCard(
+                            imageRes = R.drawable.genac_ic,
+                            onChangeClick = { /*...*/ },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
 
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    CompareCard(imageRes = R.drawable.genac_ic, onChangeClick = { /*...*/ }, modifier = Modifier.weight(1f))
-                    CompareCard(imageRes = R.drawable.genac_ic, onChangeClick = { /*...*/ }, modifier = Modifier.weight(1f))
+                    Text(
+                        text = stringResource(id = R.string.compare_facilty),
+                        fontSize = 24.sp,
+                        fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
+                        modifier = Modifier.padding(top = 10.dp, start = 15.dp, end = 15.dp)
+                    )
                 }
 
-                Text(stringResource(id = R.string.compare_facilty),
-                    fontSize = 24.sp,
-                    fontFamily = FontFamily(Font(R.font.poppins_bold)),
-                    modifier = Modifier.padding(top = 10.dp))
+                items(listOf(
+                    Triple(R.string.name_of_society, "lorem ipsum", "lorem ipsum"),
+                    Triple(R.string.provider_information, "John Deo", "Tom"),
+                    Triple(R.string.floor, "10th of 21 Floors", "2nd Floors"),
+                    Triple(R.string.status, "Immediately", "Immediately"),
+                    Triple(R.string.furnished_status, "Semi", "fully"),
+                    Triple(R.string.year_built, "2006", "2010"),
+                    Triple(R.string.garage, "1", "0"),
+                    Triple(
+                        R.string.overview,
+                        "Lorem ipsum dolor sit amet consectetur. Sollicitudin aliquam donec morbi risus pellentesque.donec morbi risus pellentesque.donec morbi risus pellentesque. ",
+                        "Lorem ipsum dolor sit amet consectetur. Sollicitudin aliquam donec morbi risus pellentesque.donec morbi risus pellentesque.donec morbi risus pellentesque. "
+                    ),
+                    Triple(R.string.amenities, "Lorem,  ipsum,  dolor, amet.", "Lorem,  ipsum,  dolor, amet.")
+                )) { (labelRes, val1, val2) ->
+                    CompareRow(stringResource(id = labelRes), val1, val2)
+                }
 
-                CompareRow(stringResource(id = R.string.name_of_society),"lorem ipsum","lorem ipsum")
-                CompareRow(stringResource(id = R.string.provider_information),"John Deo","Tom")
-                CompareRow(stringResource(id = R.string.floor),"10th of 21 Floors","2nd Floors")
-                CompareRow(stringResource(id = R.string.status),"Immediately","Immediately")
-                CompareRow(stringResource(id = R.string.furnished_status),"Semi","fully")
-                CompareRow(stringResource(id = R.string.year_built),"2006","2010")
-                CompareRow(stringResource(id = R.string.garage),"1","0")
-                CompareRow(stringResource(id = R.string.overview),"Lorem ipsum dolor sit amet consectetur. Sollicitudin aliquam donec morbi risus pellentesque.donec morbi risus pellentesque.donec morbi risus pellentesque. ","Lorem ipsum dolor sit amet consectetur. Sollicitudin aliquam donec morbi risus pellentesque.donec morbi risus pellentesque.donec morbi risus pellentesque. ")
-                CompareRow(stringResource(id = R.string.amenities),"Lorem,  ipsum,  dolor, amet.","Lorem,  ipsum,  dolor, amet.")
+                item {
+                    Text(
+                        text = "Download Brochure",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(color = Color(0xFFF3F3F3))
+                            .padding(10.dp),
+                        textAlign = TextAlign.Center,
+                        fontFamily = FontFamily(Font(R.font.poppins)),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = Color.Black
+                    )
 
-                Text(
-                    text = "Download Brochure",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = Color(0xFFF3F3F3))
-                        .padding(10.dp),
-                    textAlign = TextAlign.Center,
-                    fontFamily = FontFamily(Font(R.font.poppins)),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = Color.Black
-                )
+                    DownloadButtonRow(
+                        isVisible = true,
+                        onDownload1Click = { /* download PDF 1 */ },
+                        onDownload2Click = { /* download PDF 2 */ }
+                    )
 
-                DownloadButtonRow(
-                    isVisible = true, // or false to hide
-                    onDownload1Click = { /* download PDF 1 */ },
-                    onDownload2Click = { /* download PDF 2 */ }
-                )
+                    Spacer(Modifier.height(15.dp))
 
-                Spacer(Modifier.height(15.dp))
+                    Text(
+                        text = stringResource(id = R.string._under_line_fetaure_fac),
+                        fontSize = 24.sp,
+                        color = Color(0xFFEA5B60),
+                        fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
+                        modifier = Modifier.padding(top = 10.dp, start = 15.dp, end = 15.dp),
+                        style = TextStyle(textDecoration = TextDecoration.Underline)
+                    )
 
-                FeaturedFacilityList(facilitiesList)
 
+                    FeaturedFacilityList(
+                        facilities = facilitiesList,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 300.dp) //  constrain height!
+                    )
+
+                }
             }
         }
     }
 }
+
 
 @Composable
 fun CompareCard(
@@ -211,8 +249,8 @@ fun CompareRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(6.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(horizontal = 6.dp, vertical = 2.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = value1.ifEmpty { "-" },
@@ -233,6 +271,8 @@ fun CompareRow(
                 color = Color.Black
             )
         }
+
+
     }
 }
 
@@ -248,20 +288,20 @@ fun DownloadButtonRow(
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = 35.dp, vertical = 6.dp),
+                .padding(horizontal = 35.dp, vertical = 2.dp),
             horizontalArrangement = Arrangement.Center
         ) {
             Button(
                 onClick = onDownload1Click,
                 modifier = Modifier
                     .weight(1f)
-                    .height(25.dp)
+                    .wrapContentHeight()
                     .padding(end = 9.dp),
                 colors = ButtonDefaults.buttonColors(
                     Purple,
                     contentColor = Color.White
                 ),
-                shape = RoundedCornerShape(17.dp), // adjust based on your `@drawable/download_btn_bg`
+                shape = RoundedCornerShape(20.dp), // adjust based on your `@drawable/download_btn_bg`
                 elevation = ButtonDefaults.buttonElevation(4.dp)
             ) {
                 Text(
@@ -276,13 +316,13 @@ fun DownloadButtonRow(
                 onClick = onDownload2Click,
                 modifier = Modifier
                     .weight(1f)
-                    .height(25.dp)
+                    .wrapContentHeight(             )
                     .padding(start = 9.dp),
                 colors = ButtonDefaults.buttonColors(
                     Purple,
                     contentColor = Color.White
                 ),
-                shape = RoundedCornerShape(17.dp),
+                shape = RoundedCornerShape(20.dp),
                 elevation = ButtonDefaults.buttonElevation(4.dp)
             ) {
                 Text(
@@ -330,11 +370,19 @@ fun FacilityTitleText(boldHeading : String , text : String){
 }
 
 @Composable
-fun FeaturedFacilityList(facilities: List<Facility>) {
-    LazyColumn {
+fun FeaturedFacilityList(
+    facilities: List<Facility>,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(modifier = modifier) {
         items(facilities) { facility ->
-            FacilityCard(facility = facility, showRating = false,
-                showBookmark = true, onBookmarkClick = { /*...*/ }, onCardClick = { }, fromTextColor = Purple
+            FacilityCard(
+                facility = facility,
+                showRating = false,
+                showBookmark = true,
+                onBookmarkClick = { /*...*/ },
+                onCardClick = {},
+                fromTextColor = Color(0xFF5C2C4D)
             )
         }
     }

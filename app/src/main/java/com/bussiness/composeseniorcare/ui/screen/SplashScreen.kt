@@ -3,6 +3,7 @@ package com.bussiness.composeseniorcare.ui.screen
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,10 +20,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.bussiness.composeseniorcare.R
 import com.bussiness.composeseniorcare.navigation.Routes
 import com.bussiness.composeseniorcare.ui.theme.BackColor
 import kotlinx.coroutines.delay
@@ -68,12 +71,10 @@ fun SplashScreen(navController: NavHostController) {
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.Person,
+        ) { Image(
+                painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Placeholder Logo",
-                tint = Color.White,
-                modifier = Modifier.size(90.dp)
+                modifier = Modifier.size(220.dp)
             )
         }
     }

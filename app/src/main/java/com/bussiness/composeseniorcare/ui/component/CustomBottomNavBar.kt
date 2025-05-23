@@ -50,7 +50,7 @@ fun CustomBottomBar(
     onItemClick: (BottomNavItem) -> Unit
 ) {
     Surface(
-        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+//        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         color = Color.White,
         shadowElevation = 8.dp
     ) {
@@ -92,7 +92,7 @@ fun CustomBottomBar(
                     Text(
                         text = item.label,
                         color = if (selected) Color(0xFF5C2C4D) else Color(0xFF303030),
-                        fontSize = 11.sp,
+                        fontSize = 10.sp,
                         fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
                         maxLines = 1
                     )

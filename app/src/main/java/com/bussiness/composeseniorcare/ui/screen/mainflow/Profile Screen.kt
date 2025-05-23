@@ -18,16 +18,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -38,6 +34,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,13 +58,18 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.bussiness.composeseniorcare.R
-import com.bussiness.composeseniorcare.ui.component.SharpEdgeButton
 import com.bussiness.composeseniorcare.ui.component.SubmitButton
 import com.bussiness.composeseniorcare.ui.component.TopHeadingText
 import com.bussiness.composeseniorcare.ui.theme.Purple
 
 @Composable
 fun ProfileScreen(navController: NavHostController) {
+
+    var name by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf("") }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -120,22 +125,22 @@ fun ProfileScreen(navController: NavHostController) {
                     EditProfileButton()
                 }
 
-                ProfileInfoItem("Name","Enter name", onNameChange = { /* Handle name change */ },
+                ProfileInfoItem("Name",name, onValueChange = { name = it },
                     painterResource(id = R.drawable.name_ic), showEditIcon = true)
 
                 Spacer(Modifier.height(5.dp))
 
-                ValidityInfoItem("Email", "Enter email", onNameChange = { /* Handle phone change */ },
+                ValidityInfoItem("Email", email, onValueChange = { email = it },
                     painterResource(id = R.drawable.email_ic))
 
                 Spacer(Modifier.height(5.dp))
 
-                ValidityInfoItem("Phone", "Enter phone number", onNameChange = { /* Handle phone change */ },
+                ValidityInfoItem("Phone", phone, onValueChange = { phone = it },
                     painterResource(id = R.drawable.call_ic))
 
                 Spacer(Modifier.height(5.dp))
 
-                ProfileInfoItem("Location","Enter location", onNameChange = { /* Handle name change */ },
+                ProfileInfoItem("Location",location, onValueChange = { location = it },
                     painterResource(id = R.drawable.loc_ic), showEditIcon = true)
 
                 Spacer(Modifier.height(80.dp))
@@ -207,7 +212,7 @@ fun EditProfileButton(
             containerColor = Color.White,
             contentColor = Purple
         ),
-        contentPadding = PaddingValues(horizontal = 15.dp, vertical = 1.dp),
+        contentPadding = PaddingValues(horizontal = 15.dp, vertical = 3.dp),
         modifier = Modifier.height(32.dp)
     ) {
         Text(
@@ -224,12 +229,12 @@ fun EditProfileButton(
 
 @Composable
 fun ProfileInfoItem(
-    name: String,
-    hint: String,
-    onNameChange: (String) -> Unit,
-    icon : Painter,
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    icon: Painter,
     modifier: Modifier = Modifier,
-    isEditable: Boolean = false,
+    isEditable: Boolean = true,
     showEditIcon: Boolean = false,
     onEditClick: () -> Unit = {}
 ) {
@@ -239,7 +244,7 @@ fun ProfileInfoItem(
             .background(Color.White)
             .padding(top = 15.dp)
     ) {
-        // Left icon in Card
+        // Left icon in a Card
         Card(
             modifier = Modifier
                 .padding(2.dp)
@@ -256,57 +261,58 @@ fun ProfileInfoItem(
             ) {
                 Icon(
                     painter = icon,
-                    contentDescription = "Name Icon",
+                    contentDescription = "Field Icon",
                     tint = Color.Unspecified,
                     modifier = Modifier.size(24.dp)
                 )
             }
         }
 
-        // Text content and input field
+        // Label and input field
         Column(
             modifier = Modifier
                 .weight(1f)
                 .padding(start = 8.dp)
         ) {
             Text(
-                text = name, // Or stringResource(R.string.name)
+                text = label,
                 color = Color(0xFF4E4E4E),
                 fontSize = 14.sp,
-                fontFamily = FontFamily(Font(R.font.poppins)),
-                modifier = Modifier.background(Color.White)
+                fontFamily = FontFamily(Font(R.font.poppins))
             )
 
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(IntrinsicSize.Min) // So divider respects the height of content
+                    .height(IntrinsicSize.Min)
             ) {
                 BasicTextField(
-                    value = hint,
-                    onValueChange = onNameChange,
+                    value = value,
+                    onValueChange = onValueChange,
                     singleLine = true,
+                    enabled = isEditable,
                     textStyle = TextStyle(
-                        fontSize = 12.sp,
+                        fontSize = 16.sp,
                         fontFamily = FontFamily(Font(R.font.poppins)),
                         color = Color.Black
                     ),
+                    cursorBrush = SolidColor(Color.Black),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(end = if (showEditIcon) 40.dp else 0.dp)  // leave space for icon if visible
-                        .align(Alignment.CenterStart),
-                    cursorBrush = SolidColor(Color.Black),
+                        .padding(end = if (showEditIcon) 40.dp else 0.dp)
+                        .align(Alignment.BottomStart),
                     decorationBox = { innerTextField ->
-                        if (name.isEmpty()) {
-                            Text(
-                                text = "Enter name",
-                                fontSize = 12.sp,
-                                fontFamily = FontFamily(Font(R.font.poppins)),
-                                color = Color.Gray,
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                        Box {
+                            if (value.isEmpty()) {
+                                Text(
+                                    text = "Enter $label",
+                                    fontSize = 16.sp,
+                                    fontFamily = FontFamily(Font(R.font.poppins)),
+                                    color = Color.Gray
+                                )
+                            }
+                            innerTextField()
                         }
-                        innerTextField()
                     }
                 )
 
@@ -315,7 +321,7 @@ fun ProfileInfoItem(
                         onClick = onEditClick,
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
-                            .size(36.dp)  // increase touch target size for better UX
+                            .size(36.dp)
                             .padding(end = 4.dp, top = 4.dp)
                     ) {
                         Icon(
@@ -327,7 +333,7 @@ fun ProfileInfoItem(
                 }
 
                 Divider(
-                    color = Color.Gray,
+                    color = Color(0xFFD4D4D4),
                     thickness = 1.dp,
                     modifier = Modifier
                         .align(Alignment.BottomStart)
@@ -335,28 +341,30 @@ fun ProfileInfoItem(
                 )
             }
         }
-
     }
 }
 
+
 @Composable
 fun ValidityInfoItem(
-    name: String,
-    hint: String,
-    onNameChange: (String) -> Unit,
-    icon : Painter,
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    icon: Painter,
     modifier: Modifier = Modifier,
-    isEditable: Boolean = false,
+    isEditable: Boolean = true,
     showEditIcon: Boolean = false,
     onVerifyClick: () -> Unit = {}
 ) {
+    val grayColor = Color(0xFFD4D4D4)
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(Color.White)
             .padding(top = 15.dp)
     ) {
-        // Left icon in Card
+        // Left icon
         Card(
             modifier = Modifier
                 .padding(2.dp)
@@ -373,57 +381,58 @@ fun ValidityInfoItem(
             ) {
                 Icon(
                     painter = icon,
-                    contentDescription = "Name Icon",
+                    contentDescription = "Field Icon",
                     tint = Color.Unspecified,
                     modifier = Modifier.size(24.dp)
                 )
             }
         }
 
-        // Text content and input field
+        // Right side content
         Column(
             modifier = Modifier
                 .weight(1f)
                 .padding(start = 8.dp)
         ) {
             Text(
-                text = name, // Or stringResource(R.string.name)
+                text = label,
                 color = Color(0xFF4E4E4E),
                 fontSize = 14.sp,
-                fontFamily = FontFamily(Font(R.font.poppins)),
-                modifier = Modifier.background(Color.White)
+                fontFamily = FontFamily(Font(R.font.poppins))
             )
 
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(IntrinsicSize.Min) // Key to make content wrap tightly
             ) {
-                // Main content layout
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 4.dp), // space above divider
-                    verticalAlignment = Alignment.CenterVertically
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.Bottom
                 ) {
+                    // TextField aligned to bottom
                     BasicTextField(
-                        value = hint,
-                        onValueChange = onNameChange,
+                        value = value,
+                        onValueChange = onValueChange,
                         singleLine = true,
+                        enabled = isEditable,
                         textStyle = TextStyle(
-                            fontSize = 12.sp,
+                            fontSize = 16.sp,
                             fontFamily = FontFamily(Font(R.font.poppins)),
                             color = Color.Black
                         ),
-                        modifier = Modifier
-                            .weight(1f) // Take all available space except for the button
-                            .padding(end = 8.dp),
                         cursorBrush = SolidColor(Color.Black),
+                        modifier = Modifier
+                            .weight(1f)
+                            .align(Alignment.Bottom)
+                            .padding(end = 8.dp),
                         decorationBox = { innerTextField ->
                             Box {
-                                if (hint.isEmpty()) {
+                                if (value.isEmpty()) {
                                     Text(
-                                        text = "Enter name",
-                                        fontSize = 12.sp,
+                                        text = "Enter $label",
+                                        fontSize = 16.sp,
                                         fontFamily = FontFamily(Font(R.font.poppins)),
                                         color = Color.Gray
                                     )
@@ -433,43 +442,37 @@ fun ValidityInfoItem(
                         }
                     )
 
+                    // Verify button
                     Box(
                         contentAlignment = Alignment.Center,
-                        modifier = modifier
-                            .wrapContentWidth()
-                            .wrapContentHeight()
+                        modifier = Modifier
                             .clip(RoundedCornerShape(5.dp))
                             .background(color = Purple)
                             .clickable { onVerifyClick() }
-                            .padding(horizontal = 10.dp)
-                            .align(Alignment.CenterVertically)
+                            .padding(horizontal = 10.dp, vertical = 1.dp)
                     ) {
                         Text(
                             text = "Verify",
                             fontFamily = FontFamily(Font(R.font.poppins)),
-                            fontSize = 9.sp,
+                            fontSize = 10.sp,
                             color = Color.White,
                             textAlign = TextAlign.Center
                         )
                     }
-
-
                 }
 
-                // Underline below the full row (text + button)
                 Divider(
-                    color = Color.Gray,
+                    color = grayColor,
                     thickness = 1.dp,
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .fillMaxWidth()
                 )
             }
-
         }
-
     }
 }
+
 
 
 @Preview(showBackground = true)
