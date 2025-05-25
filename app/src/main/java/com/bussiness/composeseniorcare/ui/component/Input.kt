@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -57,7 +58,6 @@ fun EmailOrPhoneInput(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    label: String = ErrorMessage.EMAIL_OR_PHONE,
     placeholder: String = ErrorMessage.EMAIL_OR_PHONE
 ) {
     var isError by remember { mutableStateOf(false) }
@@ -68,43 +68,61 @@ fun EmailOrPhoneInput(
         return isEmail || isPhone
     }
 
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = {
-            onValueChange(it)
-            isError = !validate(it) && it.isNotEmpty()
-        },
-        label = { Text(label) },
-        placeholder = { Text(placeholder) },
-        isError = isError,
-        singleLine = true,
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .wrapContentHeight(),
-        shape = RoundedCornerShape(10.dp),
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Email,
-            imeAction = ImeAction.Done
-        ),
-        trailingIcon = {
-            if (isError) {
-                Image(
-                    painter = painterResource(id = R.drawable.home_icon),
-                    contentDescription = "Error",
-                )
-            }
-        },
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = if (isError) MaterialTheme.colorScheme.error else Color(0xFFD0D0D0),
-            unfocusedBorderColor = if (isError) MaterialTheme.colorScheme.error else Color(0xFFD0D0D0),
-            errorBorderColor = MaterialTheme.colorScheme.error,
-            focusedContainerColor = BackColor,
-            unfocusedContainerColor = BackColor,
-            errorContainerColor = BackColor
-        )
-    )
+            .height(40.dp)
+            .background(color = Color(0xFFE8F4F4), shape = RoundedCornerShape(12.dp))
+            .border(
+                width = 1.dp,
+                color = if (isError) MaterialTheme.colorScheme.error else Color(0xFFD0D0D0),
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                painter = painterResource(id = R.drawable.mail_svg),
+                contentDescription = null,
+                tint = Color(0xFF9E9E9E),
+                modifier = Modifier.size(20.dp)
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            BasicTextField(
+                value = value,
+                onValueChange = {
+                    onValueChange(it)
+                    isError = !validate(it) && it.isNotEmpty()
+                },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Done
+                ),
+                textStyle = LocalTextStyle.current.copy(
+                    color = Color.Black,
+                    fontSize = 16.sp
+                ),
+                decorationBox = { innerTextField ->
+                    if (value.isEmpty()) {
+                        Text(
+                            text = placeholder,
+                            color = Color(0xFF9E9E9E),
+                            fontSize = 16.sp
+                        )
+                    }
+                    innerTextField()
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
 }
+
+
 
 
 @Composable
@@ -130,12 +148,10 @@ fun PasswordInput(
     password: String,
     onPasswordChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    label: String = "Password",
-    placeholder: String = "Enter your password"
+    placeholder: String = "Your Password"
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
 
-    // Validation checks
     val hasMinLength = password.length >= 8
     val hasUpperCase = password.any { it.isUpperCase() }
     val hasSpecialChar = password.any { !it.isLetterOrDigit() }
@@ -144,53 +160,69 @@ fun PasswordInput(
     val isValid = hasMinLength && hasUpperCase && hasSpecialChar && hasNumber
     val isError = password.isNotEmpty() && !isValid
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(color = BackColor)
-    ) {
-
+    Column(modifier = modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(40.dp)
+                .background(color = Color(0xFFE8F4F4), shape = RoundedCornerShape(12.dp))
                 .border(
-                    width = 2.dp,
+                    width = 1.dp,
                     color = if (isError) MaterialTheme.colorScheme.error else Color(0xFFD0D0D0),
-                    shape = MaterialTheme.shapes.small
+                    shape = RoundedCornerShape(12.dp)
                 )
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.CenterStart
         ) {
-            TextField(
-                value = password,
-                onValueChange = onPasswordChange,
-                placeholder = { Text(placeholder) },
-                singleLine = true,
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done
-                ),
-                isError = isError,
-                modifier = Modifier.fillMaxWidth(),  // fill width inside the bordered Box
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Transparent, // remove default underline indicator
-                    unfocusedIndicatorColor = Color.Transparent,
-                    errorIndicatorColor = Color.Transparent
-                ),
-                trailingIcon = {
-                    val image = if (passwordVisible)
-                        Icons.Default.Visibility
-                    else
-                        Icons.Default.VisibilityOff
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_lock),
+                    contentDescription = null,
+                    tint = Color(0xFF9E9E9E),
+                    modifier = Modifier.size(20.dp)
+                )
 
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(
-                            imageVector = image,
-                            contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                            tint = if (isError) MaterialTheme.colorScheme.error else Color.Gray
-                        )
-                    }
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Box(modifier = Modifier.weight(1f)) {
+                    BasicTextField(
+                        value = password,
+                        onValueChange = onPasswordChange,
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Done
+                        ),
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        textStyle = LocalTextStyle.current.copy(
+                            color = Color.Black,
+                            fontSize = 16.sp
+                        ),
+                        decorationBox = { innerTextField ->
+                            if (password.isEmpty()) {
+                                Text(
+                                    text = placeholder,
+                                    color = Color(0xFF9E9E9E),
+                                    fontSize = 16.sp
+                                )
+                            }
+                            innerTextField()
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
-            )
+
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                        contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                        tint = Color.Black
+                    )
+                }
+            }
         }
 
         if (isError) {
@@ -203,6 +235,7 @@ fun PasswordInput(
         }
     }
 }
+
 
 @Composable
 fun SubmitButton(

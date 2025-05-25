@@ -7,13 +7,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.bussiness.composeseniorcare.ui.screen.MainScreen
-import com.bussiness.composeseniorcare.ui.screen.SplashScreen
+import com.bussiness.composeseniorcare.ui.intro.SplashScreen
 import com.bussiness.composeseniorcare.ui.screen.authflow.CreatePasswordScreen
 import com.bussiness.composeseniorcare.ui.screen.authflow.ForgotPasswordScreen
 import com.bussiness.composeseniorcare.ui.screen.authflow.LoginScreen
 import com.bussiness.composeseniorcare.ui.screen.authflow.SignUpScreen
 import com.bussiness.composeseniorcare.ui.screen.authflow.VerifyOTP
-import com.bussiness.composeseniorcare.ui.screen.mainflow.FacilityListing
 
 @Composable
 fun NavGraph(navController: NavHostController) {

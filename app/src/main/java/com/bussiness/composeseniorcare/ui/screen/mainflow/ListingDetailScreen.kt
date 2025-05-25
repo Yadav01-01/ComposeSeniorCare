@@ -38,9 +38,7 @@ import com.bussiness.composeseniorcare.R
 import com.bussiness.composeseniorcare.ui.theme.Purple
 
 @Composable
-fun ListingDetail(
-    navController: NavHostController
-) {
+fun ListingDetail(navController: NavHostController) {
 
     val imageList = listOf(
         R.drawable.detail_map_ic,
