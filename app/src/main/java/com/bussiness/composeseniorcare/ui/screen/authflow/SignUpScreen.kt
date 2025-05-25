@@ -54,6 +54,7 @@ fun SignUpScreen(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
 ) {
+
     var input by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
