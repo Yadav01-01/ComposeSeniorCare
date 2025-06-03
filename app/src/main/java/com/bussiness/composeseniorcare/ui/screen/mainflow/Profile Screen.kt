@@ -38,7 +38,7 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -464,12 +464,12 @@ fun ProfileInfoItem(
                     }
                 }
 
-                Divider(
-                    color = Color(0xFFD4D4D4),
-                    thickness = 1.dp,
+                HorizontalDivider(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    thickness = 1.dp,
+                    color = Color(0xFFD4D4D4)
                 )
             }
         }
@@ -566,7 +566,7 @@ fun ValidityInfoItem(
                     )
 
                     // Verify button
-                    if (showEditIcon){
+                    if (showEditIcon) {
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
@@ -586,12 +586,12 @@ fun ValidityInfoItem(
                     }
                 }
 
-                Divider(
-                    color = grayColor,
-                    thickness = 1.dp,
+                HorizontalDivider(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    thickness = 1.dp,
+                    color = grayColor
                 )
             }
         }

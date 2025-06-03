@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,7 +37,7 @@ fun DeleteAccount(navController: NavHostController) {
     var selectedReason by rememberSaveable { mutableStateOf("") }
     var otherMessage by rememberSaveable { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
-    var context = LocalContext.current
+    val context = LocalContext.current
 
     val reasons = listOf(
         "I don’t want to use Home Care anymore",
@@ -228,10 +227,10 @@ fun DeleteFeedbackCard(
                 }
 
                 if (index != items.lastIndex) {
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier.fillMaxWidth(),
-                        color = Color(0xFFEAEAEA),
-                        thickness = 1.dp
+                        thickness = 1.dp,
+                        color = Color(0xFFEAEAEA)
                     )
                 }
 

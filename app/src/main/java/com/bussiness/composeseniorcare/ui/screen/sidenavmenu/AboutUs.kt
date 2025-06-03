@@ -238,14 +238,14 @@ fun DeleteAccountButton(
                 text = stringResource(R.string.request_to_delete_account),
                 fontFamily = FontFamily(Font(R.font.poppins)),
                 fontWeight = FontWeight.Bold,
-                fontSize = 12.sp,
+                fontSize = 11.sp,
                 color = Purple
             )
 
             Text(
                 text = stringResource(R.string.request_to_closure_of_your_account),
                 fontFamily = FontFamily(Font(R.font.poppins)),
-                fontSize = 12.sp,
+                fontSize = 11.sp,
                 color = Purple
             )
         }
@@ -271,7 +271,7 @@ fun AboutUsScreenPreview() {
     MaterialTheme {
         AboutUs(
             navController = navController,
-            title = "Privacy Policy"
+            title = ""
         )
     }
 }

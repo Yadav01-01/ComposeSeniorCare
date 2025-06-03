@@ -85,7 +85,7 @@ fun FAQScreen(navController: NavHostController) {
                         TextSection(
                             title = "Frequently Asked Questions",
                             modifier = Modifier.padding(vertical = 10.dp),
-                            fontSize = 24,
+                            fontSize = 22,
                             fontFamily = Poppins,
                             fontWeight = FontWeight.Bold
                         )

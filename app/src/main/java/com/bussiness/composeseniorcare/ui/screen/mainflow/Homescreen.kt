@@ -432,10 +432,10 @@ fun BannerItem(
 
         // Banner Text (centered)
         Text(
-            text = "Explore trusted senior living facilities\n tailored to your needs. Search, compare,\n and connect effortlessly today!",
+            text = "Explore trusted senior living facilities tailored to your needs. Search, compare, and connect effortlessly today!",
             modifier = Modifier
                 .align(Alignment.Center)
-                .padding(10.dp),
+                .padding(horizontal = 25.dp),
             textAlign = TextAlign.Center,
             color = Color.White,
             fontSize = 14.sp,
