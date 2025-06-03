@@ -29,7 +29,8 @@ import com.bussiness.composeseniorcare.ui.theme.Purple
 @Composable
 fun SavedFacilities(
     navController: NavHostController,
-    facilities: List<Facility>
+    facilities: List<Facility>,
+    onOpenDrawer: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -44,7 +45,7 @@ fun SavedFacilities(
                 )
             )
     ) {
-        CustomTopAppBar(showCredit = false)
+        CustomTopAppBar(showCredit = false, onMenuClick = onOpenDrawer)
 
         Box(
             modifier = Modifier
@@ -95,7 +96,8 @@ fun SavedFacilitiesScreenPreview() {
     MaterialTheme {
         SavedFacilities(
             navController = navController,
-            facilities = facilitiesList // replace with preview list
+            facilities = facilitiesList, // replace with preview list
+            onOpenDrawer = {}
         )
     }
 }

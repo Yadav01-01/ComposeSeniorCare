@@ -1,18 +1,38 @@
 package com.bussiness.composeseniorcare.ui.intro
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
@@ -22,21 +42,28 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.bussiness.composeseniorcare.R
+import com.bussiness.composeseniorcare.data.model.OnboardingData
+import com.bussiness.composeseniorcare.navigation.Routes
 import com.bussiness.composeseniorcare.ui.theme.Purple
-import com.google.accompanist.pager.*
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.launch
 
-data class OnboardingData(val imageRes: Int, val title: String, val description: String)
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
-fun OnboardingScreen() {
-    val pagerState = rememberPagerState()
+fun OnboardingScreen(navController: NavHostController) {
     val onboardingItems = listOf(
-        OnboardingData(R.drawable.onb_img1, "Lorem Ipsum", "Lorem Ipsum is simply dummy text of the printing and typesetting industry."),
+        OnboardingData(R.drawable.onb_img1, "Lorem Ipsum", "Lorem Ipsum is simply dummy text of the printing and typesetting industry."),
         OnboardingData(R.drawable.onb_img2, "Stay Connected", "Keep in touch with your loved ones easily."),
         OnboardingData(R.drawable.onb_img3, "Get Started", "Let's begin your journey with us.")
     )
+
+    val pagerState = rememberPagerState()
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -49,29 +76,48 @@ fun OnboardingScreen() {
             state = pagerState,
             modifier = Modifier.weight(1f)
         ) { page ->
-            OnboardingCard(onboardingItems[page])
+            OnboardingCard(
+                data = onboardingItems[page],
+                pageIndex = page,
+                totalPages = onboardingItems.size,
+                pagerState = pagerState,
+                onSkipClick = {
+                   navController.navigate(Routes.LOGIN)
+                },
+                onNextClick = {
+                    coroutineScope.launch {
+                        if (pagerState.currentPage < onboardingItems.size - 1) {
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                        } else {
+                            navController.navigate(Routes.LOGIN)
+                        }
+                    }
+                }
+            )
         }
 
-//        CustomPagerIndicator(pagerState)
     }
 }
 
 @Composable
-fun OnboardingCard(data: OnboardingData, onSkipClick: () -> Unit = {}) {
+fun OnboardingCard(
+    data: OnboardingData,
+    pageIndex: Int,
+    totalPages: Int,
+    pagerState: PagerState,
+    onSkipClick: () -> Unit,
+    onNextClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFE6F3F2))
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // Top image with Skip button
+        Column(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(0.55f)
-                    .background(Color(0xFFE6F3F2))
             ) {
                 Image(
                     painter = painterResource(id = data.imageRes),
@@ -83,7 +129,7 @@ fun OnboardingCard(data: OnboardingData, onSkipClick: () -> Unit = {}) {
                             RoundedCornerShape(
                                 topStart = 20.dp,
                                 topEnd = 20.dp,
-                                bottomStart = 20.dp
+                                bottomStart = 20.dp,
                             )
                         )
                 )
@@ -92,7 +138,7 @@ fun OnboardingCard(data: OnboardingData, onSkipClick: () -> Unit = {}) {
                     onClick = onSkipClick,
                     modifier = Modifier
                         .align(Alignment.TopStart)
-                        .padding(start = 15.dp, top = 25.dp)
+                        .padding(start = 15.dp, top = 35.dp)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.skip_ic),
@@ -102,7 +148,6 @@ fun OnboardingCard(data: OnboardingData, onSkipClick: () -> Unit = {}) {
                 }
             }
 
-            // Bottom content area
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -110,16 +155,10 @@ fun OnboardingCard(data: OnboardingData, onSkipClick: () -> Unit = {}) {
                     .background(Color(0xFFE6F3F2))
                     .padding(10.dp)
             ) {
-                // Icon row (dummy icons, replace if needed)
-                Row(
-                    modifier = Modifier
-                        .padding(start = 8.dp, top = 15.dp, bottom = 10.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(Icons.Default.Home, contentDescription = null, tint = Color(0xFF5C2C4D))
-                    Icon(Icons.Default.Home, contentDescription = null, tint = Color(0xFF5C2C4D))
-                    Icon(Icons.Default.Home, contentDescription = null, tint = Color(0xFF5C2C4D))
-                }
+                HomeIconIndicator(
+                    totalDots = totalPages,
+                    selectedIndex = pageIndex
+                )
 
                 Text(
                     text = data.title.uppercase(),
@@ -129,10 +168,8 @@ fun OnboardingCard(data: OnboardingData, onSkipClick: () -> Unit = {}) {
                         fontFamily = FontFamily(Font(R.font.poppins)),
                         fontWeight = FontWeight.Bold
                     ),
-                    modifier = Modifier
-                        .padding(start = 8.dp, top = 48.dp)
+                    modifier = Modifier.padding(start = 8.dp, top = 20.dp)
                 )
-
 
                 Text(
                     text = data.description,
@@ -142,13 +179,24 @@ fun OnboardingCard(data: OnboardingData, onSkipClick: () -> Unit = {}) {
                         fontFamily = FontFamily(Font(R.font.poppins)),
                         fontWeight = FontWeight.Normal
                     ),
-                    modifier = Modifier
-                        .padding(start = 8.dp, end = 80.dp, top = 10.dp)
+                    modifier = Modifier.padding(start = 8.dp, end = 80.dp, top = 10.dp)
                 )
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                ) {
+                    CustomPagerIndicator(
+                        totalDots = totalPages,
+                        selectedIndex = pageIndex
+                    )
+                }
             }
         }
 
-        // Side curve and purple bar overlay
         Image(
             painter = painterResource(id = R.drawable.side_curv_bar),
             contentDescription = "Side curve",
@@ -156,9 +204,13 @@ fun OnboardingCard(data: OnboardingData, onSkipClick: () -> Unit = {}) {
             modifier = Modifier
                 .fillMaxHeight()
                 .align(Alignment.CenterEnd)
+                .clickable(
+                    indication = null, // No ripple or visual effect
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    onNextClick()
+                }
         )
-
-
     }
 }
 
@@ -167,11 +219,11 @@ fun CustomPagerIndicator(
     totalDots: Int,
     selectedIndex: Int,
     modifier: Modifier = Modifier,
-    activeColor: Color = Color(0xFF5F2A44), // Dark plum fill
-    borderColor: Color = Color(0xFF5F2A44), // Same for border
-    spacing: Dp = 12.dp,
-    size: Dp = 16.dp,
-    cornerRadius: Dp = 4.dp
+    activeColor: Color = Purple,
+    borderColor: Color = Purple,
+    spacing: Dp = 6.dp,
+    size: Dp = 9.dp,
+    cornerRadius: Dp = 3.dp
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(spacing),
@@ -187,7 +239,7 @@ fun CustomPagerIndicator(
                         color = if (index == selectedIndex) activeColor else Color.Transparent
                     )
                     .border(
-                        width = 2.dp,
+                        width = 1.dp,
                         color = borderColor,
                         shape = RoundedCornerShape(cornerRadius)
                     )
@@ -197,11 +249,56 @@ fun CustomPagerIndicator(
 }
 
 
+@Composable
+fun HomeIconIndicator(
+    totalDots: Int,
+    selectedIndex: Int,
+    modifier: Modifier = Modifier,
+    activeIconRes: Int = R.drawable.selected_ic_home,
+    inactiveIconRes: Int = R.drawable.home_onb,
+    dashLength: Float = 8f,
+    gapLength: Float = 4f,
+    lineColor: Color = Purple,
+    lineThickness: Dp = 2.dp,
+    lineLength: Dp = 22.dp
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+    ) {
+        repeat(totalDots) { index ->
+            Image(
+                painter = painterResource(id = if (index == selectedIndex) activeIconRes else inactiveIconRes),
+                contentDescription = "Indicator icon $index",
+                modifier = Modifier.wrapContentSize()
+            )
+
+            // Draw dashed line after each icon except the last one
+            if (index < totalDots - 1) {
+                Canvas(
+                    modifier = Modifier
+                        .height(lineThickness)
+                        .width(lineLength)
+                        .align(Alignment.CenterVertically)
+                ) {
+                    drawLine(
+                        color = lineColor,
+                        start = Offset(0f, 0f),
+                        end = Offset(size.width, 0f),
+                        strokeWidth = lineThickness.toPx(),
+                        pathEffect = PathEffect.dashPathEffect(floatArrayOf(dashLength, gapLength), 0f)
+                    )
+                }
+            }
+        }
+    }
+}
 
 
 
 @Preview(showBackground = true)
 @Composable
 fun OnboardingScreenPreview() {
-    OnboardingScreen()
+    val nav = rememberNavController()
+    OnboardingScreen(nav)
 }

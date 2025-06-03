@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         setContent {
            MaterialTheme{
                val navController = rememberNavController()
-               NavGraph(navController = navController)
+               NavGraph(authNavController = navController)
            }
         }
     }

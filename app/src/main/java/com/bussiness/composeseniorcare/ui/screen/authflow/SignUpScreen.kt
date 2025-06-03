@@ -1,6 +1,6 @@
 package com.bussiness.composeseniorcare.ui.screen.authflow
 
-import android.graphics.fonts.FontFamily
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,6 +12,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxColors
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -20,10 +22,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -42,23 +47,24 @@ import com.bussiness.composeseniorcare.ui.component.SubmitButton
 import com.bussiness.composeseniorcare.ui.theme.BackColor
 import com.bussiness.composeseniorcare.ui.theme.Poppins
 import com.bussiness.composeseniorcare.ui.theme.Purple
+import com.bussiness.composeseniorcare.util.SessionManager
 
 @Composable
 fun SignUpScreen(
     navController: NavHostController,
-    onLoginClick: () -> Unit = {
-        navController.navigate(Routes.LOGIN)
-    },
+    onLoginClick: () -> Unit = { navController.navigate(Routes.LOGIN) },
+    onRegisterClick: () -> Unit = { navController.navigate(Routes.MAIN_SCREEN) },
     onTermsClick: () -> Unit,
     onPrivacyClick: () -> Unit,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
 ) {
-
     var input by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-    var checkedState by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val sessionManager = remember { SessionManager(context) }
 
     Box(
         modifier = Modifier
@@ -73,15 +79,20 @@ fun SignUpScreen(
                 .height(400.dp),
             contentScale = ContentScale.Crop
         )
-        // "Skip" Button
+
+        // Skip Button
         Image(
             painter = painterResource(id = R.drawable.skip_ic),
             contentDescription = "Skip Button",
             modifier = Modifier
                 .background(Color.Transparent, shape = CircleShape)
-                .padding(horizontal = 12.dp, vertical = 25.dp)
+                .padding(horizontal = 12.dp, vertical = 35.dp)
                 .align(Alignment.TopStart)
-                .clickable { },
+                .clickable {
+                    sessionManager.setSkipLogin(true)
+                    sessionManager.setLogin(false)
+                    navController.navigate(Routes.MAIN_SCREEN)
+                }
         )
 
         Box(
@@ -101,11 +112,10 @@ fun SignUpScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 20.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.Top,
+                    .verticalScroll(rememberScrollState())
             ) {
                 Text(
-                    text = "Register",
+                    text = "Create Your Account",
                     modifier = Modifier
                         .padding(top = 30.dp)
                         .align(Alignment.CenterHorizontally),
@@ -155,9 +165,11 @@ fun SignUpScreen(
                     modifier = Modifier.padding(5.dp)
                 ) {
                     Checkbox(
-                        checked = checkedState,
+                        checked = checked,
                         onCheckedChange = onCheckedChange,
-                        modifier = Modifier
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = Color(0xFF5C2C4D)
+                        )
                     )
 
                     Spacer(modifier = Modifier.width(3.dp))
@@ -199,7 +211,33 @@ fun SignUpScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                SubmitButton(text = "Register", onClick = onLoginClick, modifier = Modifier)
+                SubmitButton(
+                    text = "Register",
+                    onClick = {
+                        val emailError = input.isBlank()
+                        val passwordError = password.isBlank()
+                        val confirmPasswordError = confirmPassword.isBlank()
+                        val passwordsMatch = password == confirmPassword
+
+                        val message = when {
+                            emailError && passwordError && confirmPasswordError -> "Please fill all details"
+                            emailError -> "Please enter email or phone"
+                            passwordError -> "Please enter password"
+                            confirmPasswordError -> "Please confirm your password"
+                            !passwordsMatch -> "Passwords do not match"
+                            !checked -> "Please accept terms and conditions"
+                            else -> null
+                        }
+
+                        if (message != null) {
+                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                        } else {
+                            onRegisterClick()
+                            sessionManager.setLogin(true)
+                            sessionManager.setSkipLogin(false)
+                        }
+                    }
+                )
 
                 Spacer(modifier = Modifier.height(15.dp))
 
@@ -231,6 +269,7 @@ fun SignUpScreen(
         }
     }
 }
+
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable

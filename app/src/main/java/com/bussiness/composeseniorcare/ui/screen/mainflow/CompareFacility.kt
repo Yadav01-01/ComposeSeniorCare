@@ -38,13 +38,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,14 +55,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.bussiness.composeseniorcare.R
 import com.bussiness.composeseniorcare.data.model.Facility
+import com.bussiness.composeseniorcare.navigation.Routes
 import com.bussiness.composeseniorcare.ui.theme.Purple
+import com.bussiness.composeseniorcare.ui.theme.Redish
 
 @Composable
-fun CompareFacilities(navController: NavHostController) {
+fun CompareFacilities(
+    navController: NavHostController,
+    onOpenDrawer: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(WindowInsets.statusBars.asPaddingValues())
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
@@ -70,7 +77,7 @@ fun CompareFacilities(navController: NavHostController) {
                 )
             )
     ) {
-        CustomTopAppBar(showCredit = false)
+        CustomTopAppBar(showCredit = false, onMenuClick = onOpenDrawer)
 
         // Bounded container
         Box(
@@ -88,21 +95,34 @@ fun CompareFacilities(navController: NavHostController) {
                     Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp, vertical = 15.dp)) {
                         CompareCard(
                             imageRes = R.drawable.genac_ic,
-                            onChangeClick = { /*...*/ },
-                            modifier = Modifier.weight(1f)
+                            onChangeClick = {
+                                val type = "compare"
+                                navController.navigate("${Routes.FACILITY_LISTING}/$type")
+                            } ,
+                            modifier = Modifier.weight(1f).padding(end = 5.dp)
                         )
                         CompareCard(
                             imageRes = R.drawable.genac_ic,
-                            onChangeClick = { /*...*/ },
-                            modifier = Modifier.weight(1f)
+                            onChangeClick = {
+                                val type = "compare"
+                                navController.navigate("${Routes.FACILITY_LISTING}/$type")
+                            } ,
+                            modifier = Modifier.weight(1f).padding(start = 5.dp)
                         )
                     }
 
                     Text(
-                        text = stringResource(id = R.string.compare_facilty),
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(color = Color.Black, fontWeight = FontWeight.Bold)) {
+                                append("Compare ")
+                            }
+                            withStyle(style = SpanStyle(color = Redish, fontWeight = FontWeight.Bold)) {
+                                append("Facility")
+                            }
+                        },
                         fontSize = 24.sp,
                         fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
-                        modifier = Modifier.padding(top = 10.dp, start = 15.dp, end = 15.dp)
+                        modifier = Modifier.padding(top = 0.dp, start = 15.dp, end = 15.dp, bottom = 10.dp)
                     )
                 }
 
@@ -160,7 +180,8 @@ fun CompareFacilities(navController: NavHostController) {
                         facilities = facilitiesList,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 300.dp) //  constrain height!
+                            .padding(horizontal = 15.dp),
+                        onCardClick = { navController.navigate(Routes.LISTING_DETAIL) }
                     )
 
                 }
@@ -231,14 +252,15 @@ fun CompareRow(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = Color.White)
-            .padding(vertical = 8.dp)
+
     ) {
         Text(
             text = title,
             modifier = Modifier
                 .fillMaxWidth()
                 .background(backgroundColor)
-                .padding(10.dp),
+                .padding(10.dp)
+                ,
             textAlign = TextAlign.Center,
             fontFamily = FontFamily(Font(R.font.poppins)),
             fontWeight = FontWeight.Bold,
@@ -252,25 +274,37 @@ fun CompareRow(
                 .padding(horizontal = 6.dp, vertical = 2.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = value1.ifEmpty { "-" },
+            Box(
+                modifier = Modifier.weight(1f)
+                    .padding(vertical = 8.dp)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = value1.ifEmpty { "-" },
+                    textAlign = TextAlign.Center,
+                    fontFamily = FontFamily(Font(R.font.poppins)),
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp,
+                    color = Color.Black
+                )
+            }
+
+            Box(
                 modifier = Modifier.weight(1f),
-                textAlign = TextAlign.Center,
-                fontFamily = FontFamily(Font(R.font.poppins)),
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
-                color = Color.Black
-            )
-            Text(
-                text = value2.ifEmpty { "-" },
-                modifier = Modifier.weight(1f),
-                textAlign = TextAlign.Center,
-                fontFamily = FontFamily(Font(R.font.poppins)),
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
-                color = Color.Black
-            )
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = value2.ifEmpty { "-" },
+                    textAlign = TextAlign.Center,
+                    fontFamily = FontFamily(Font(R.font.poppins)),
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp,
+                    color = Color.Black
+                )
+            }
         }
+
 
 
     }
@@ -372,16 +406,18 @@ fun FacilityTitleText(boldHeading : String , text : String){
 @Composable
 fun FeaturedFacilityList(
     facilities: List<Facility>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBookmarkClick: (Facility) -> Unit = {},
+    onCardClick: (Facility) -> Unit = {}
 ) {
-    LazyColumn(modifier = modifier) {
-        items(facilities) { facility ->
+    Column(modifier = modifier) {
+        facilities.forEach { facility ->
             FacilityCard(
                 facility = facility,
                 showRating = false,
                 showBookmark = true,
-                onBookmarkClick = { /*...*/ },
-                onCardClick = {},
+                onBookmarkClick = { onBookmarkClick(facility) },
+                onCardClick = { onCardClick(facility) },
                 fromTextColor = Color(0xFF5C2C4D)
             )
         }
@@ -390,9 +426,10 @@ fun FeaturedFacilityList(
 
 
 
+
 @Preview(showBackground = true)
 @Composable
 fun CompareFacilitiesPreview() {
     val navController = rememberNavController()
-    CompareFacilities(navController = navController)
+    CompareFacilities(navController = navController, onOpenDrawer = {})
 }

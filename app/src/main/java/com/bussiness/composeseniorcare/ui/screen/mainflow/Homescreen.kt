@@ -7,17 +7,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -27,10 +24,12 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -42,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +49,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -73,8 +74,10 @@ import com.bussiness.composeseniorcare.data.model.Facility
 import com.bussiness.composeseniorcare.data.model.PosterItem
 import com.bussiness.composeseniorcare.data.model.Provider
 import com.bussiness.composeseniorcare.navigation.Routes
+import com.bussiness.composeseniorcare.ui.component.SharpEdgeButton
 import com.bussiness.composeseniorcare.ui.theme.Purple
-import com.bussiness.composeseniorcare.ui.theme.Readish
+import com.bussiness.composeseniorcare.ui.theme.Redish
+import com.bussiness.composeseniorcare.util.SessionManager
 
 val facilities = List(5) {
     PosterItem(R.drawable.poster,"Assisted Living", "Lorem ipsum dolor sit amet, consectetur adipiscing elit")
@@ -103,10 +106,21 @@ private val featuredFacilityList = List(2) {
     )
 }
 
+val banners = listOf(
+    R.drawable.banner_bg,
+    R.drawable.banner_bg,
+    R.drawable.banner_bg
+)
+
 
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(authNavController: NavHostController,navController: NavHostController, onOpenDrawer: () -> Unit) {
+
+    val context = LocalContext.current
+    val sessionManager = remember { SessionManager(context) }
+    var isLockedVisible by remember { mutableStateOf(true) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -120,9 +134,8 @@ fun HomeScreen(navController: NavHostController) {
                 )
             )
     ) {
-        CustomTopAppBar()
+        CustomTopAppBar(onMenuClick = onOpenDrawer)
 
-        // Main content
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -132,8 +145,9 @@ fun HomeScreen(navController: NavHostController) {
             verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
             item { SearchBar() }
-            item { BannerSection() }
-            item { ExploreFacilitiesSection(facilities) }
+            item { BannerSection(banners = banners) }
+            item { ExploreFacilitiesSection(facilities,onCardClick = { navController.navigate(Routes.LISTING_DETAIL) }) }
+
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -144,7 +158,7 @@ fun HomeScreen(navController: NavHostController) {
                             withStyle(style = SpanStyle(color = Color.Black, fontWeight = FontWeight.Bold)) {
                                 append("Featured ")
                             }
-                            withStyle(style = SpanStyle(color = Readish, fontWeight = FontWeight.Bold)) {
+                            withStyle(style = SpanStyle(color = Redish, fontWeight = FontWeight.Bold)) {
                                 append("Facilities")
                             }
                         },
@@ -154,41 +168,62 @@ fun HomeScreen(navController: NavHostController) {
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    Text(
-                        text = "See all+",
-                        textDecoration = TextDecoration.Underline,
-                        fontSize = 10.sp,
-                        color = Color.Black,
-                        fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
-                        modifier = Modifier.clickable {
-                            navController.navigate(Routes.FACILITY_LISTING)
-                        }
-                    )
+                    if (sessionManager.isLoggedIn()) {
+                        Text(
+                            text = "See all+",
+                            textDecoration = TextDecoration.Underline,
+                            fontSize = 10.sp,
+                            color = Color.Black,
+                            fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
+                            modifier = Modifier.clickable {
+                                navController.navigate(Routes.FACILITY_LISTING)
+                            }
+                        )
+                    }
                 }
             }
+
             item {
                 FeaturedFacilityList(
                     facilities = facilitiesList,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 300.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    onCardClick = {
+                        navController.navigate(Routes.LISTING_DETAIL )
+                    }
                 )
             }
-            item {
-                FeaturedProvidersSection(
-                    providers = featuredFacilityList,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 300.dp), onProfileClick = { })
-            }
 
+
+            item {
+                if (isLockedVisible) {
+                    LockedCardContent(
+                        onLoginClick = {
+                            authNavController.navigate(Routes.LOGIN)
+                        },
+                        onSubscriptionClick = {
+                            // Hide the locked card and show the content
+                            isLockedVisible = false
+                        },
+                        sessionManager = sessionManager
+                    )
+                } else {
+                    FeaturedProvidersSection(
+                        providers = featuredFacilityList,
+                        modifier = Modifier.fillMaxWidth(),
+                        onProfileClick = { navController.navigate(Routes.LISTING_DETAIL) }
+                    )
+                }
+            }
         }
     }
 }
 
 
 @Composable
-fun CustomTopAppBar(showCredit: Boolean = true) {
+fun CustomTopAppBar(
+    showCredit: Boolean = true,
+    onMenuClick: () -> Unit
+) {
     val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
 
     Surface(
@@ -201,39 +236,43 @@ fun CustomTopAppBar(showCredit: Boolean = true) {
                 top = statusBarPadding.calculateTopPadding(),
                 start = 16.dp,
                 end = 16.dp,
-                bottom = 8.dp
+                bottom = 15.dp
             )
             .height(50.dp)
     ) {
-        Row(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            contentAlignment = Alignment.Center
         ) {
+            // Menu icon on left
             Icon(
-                imageVector = Icons.Default.Menu,
+                painter = painterResource(id = R.drawable.hamburger_ic),
                 contentDescription = "Menu",
-                tint = Color(0xFF4B2E56),
-                modifier = Modifier.size(24.dp)
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .size(24.dp)
+                    .align(Alignment.CenterStart)
+                    .clickable { onMenuClick() }
             )
 
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Box(
+            // Logo always center
+            Image(
+                painter = painterResource(id = R.drawable.logo_arce),
+                contentDescription = "GenAcre Logo",
                 modifier = Modifier
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.logo_arce),
-                    contentDescription = "GenAcre Logo",
-                    modifier = Modifier.height(28.dp)
-                )
-            }
+                    .height(28.dp)
+                    .align(Alignment.Center)
+            )
 
+            // Credit text on right if visible
             if (showCredit) {
-                CreditsText(modifier = Modifier.padding(start = 8.dp))
+                CreditsText(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(start = 8.dp)
+                )
             }
         }
     }
@@ -242,31 +281,38 @@ fun CustomTopAppBar(showCredit: Boolean = true) {
 
 @Composable
 fun CreditsText(modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .wrapContentSize(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.End
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.twemoji_coin),
-            contentDescription = null,
-            tint = Color.Unspecified,
-            modifier = Modifier.size(16.dp)
-        )
+    val context = LocalContext.current
+    val sessionManager = remember { SessionManager(context) }
 
-        Spacer(modifier = Modifier.width(5.dp))
+    // Control visibility based on login
+    val isVisible = remember { !sessionManager.isLoggedIn() }
 
-        Text(
-            text = "Credits : 5",
-            color = Color(0xFFEA5B60),
-            fontSize = 12.sp,
-            fontFamily = FontFamily(Font(R.font.jakarta_sans)),
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.widthIn(max = 70.dp)
-        )
+    if (isVisible) {
+        Row(
+            modifier = modifier.wrapContentSize(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.twemoji_coin),
+                contentDescription = null,
+                tint = Color.Unspecified,
+                modifier = Modifier.size(10.dp)
+            )
+
+            Spacer(modifier = Modifier.width(5.dp))
+
+            Text(
+                text = "Credits : 5",
+                color = Color(0xFFEA5B60),
+                fontSize = 12.sp,
+                fontFamily = FontFamily(Font(R.font.jakarta_sans)),
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.widthIn(max = 70.dp)
+            )
+        }
     }
 }
 
@@ -318,7 +364,7 @@ fun SearchBar() {
             if (searchText.isEmpty()) {
                 Text(
                     text = "Search for location",
-                    color = Color.Gray,
+                    color = Color(0xFF333333),
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.poppins))
                 )
@@ -346,50 +392,101 @@ fun SearchBar() {
 
 
 @Composable
-fun BannerSection() {
+fun BannerSection(banners: List<Int>) {
+    val pagerState = rememberPagerState(initialPage = 0, pageCount = { banners.size })
+
+    HorizontalPager(
+        state = pagerState,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp),
+        pageSpacing = 16.dp,
+        flingBehavior = PagerDefaults.flingBehavior(state = pagerState)
+    ) { page ->
+        BannerItem(
+            imageRes = banners[page],
+            totalBanners = banners.size,
+            currentPage = pagerState.currentPage
+        )
+    }
+}
+
+@Composable
+fun BannerItem(
+    imageRes: Int,
+    totalBanners: Int,
+    currentPage: Int
+) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
             .fillMaxWidth()
-            .background(color = Color.Gray)
-            .height(180.dp)
+            .height(200.dp)
     ) {
-
         Image(
-            painter = painterResource(id = R.drawable.banner_bg),
+            painter = painterResource(id = imageRes),
             contentDescription = "Banner",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
-
         )
-        // Use Coil for image
+
+        // Banner Text (centered)
         Text(
             text = "Explore trusted senior living facilities\n tailored to your needs. Search, compare,\n and connect effortlessly today!",
-            modifier = Modifier.align(Alignment.Center).padding(10.dp),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(10.dp),
             textAlign = TextAlign.Center,
             color = Color.White,
             fontSize = 14.sp,
             fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
+        )
 
-            )
+        // Indicators at the bottom center inside the banner
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 20.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            repeat(totalBanners) { index ->
+                val isSelected = currentPage == index
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 2.dp)
+                        .size(9.dp)
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(
+                            color = if (isSelected) Color.White else Color.Transparent
+                        )
+                        .border(
+                            width = 1.dp,
+                            color = Color.White,
+                            shape = RoundedCornerShape(3.dp)
+                        )
+                )
+            }
+        }
     }
 }
+
+
+
 @Composable
-fun ExploreFacilitiesSection(facilities: List<PosterItem>) {
+fun ExploreFacilitiesSection(facilities: List<PosterItem>,onCardClick: () -> Unit) {
     Column(modifier = Modifier) {
         Text(
             text = buildAnnotatedString {
                 withStyle(style = SpanStyle(color = Color.Black, fontWeight = FontWeight.Bold)) {
                     append("Explore ")
                 }
-                withStyle(style = SpanStyle(color = Readish, fontWeight = FontWeight.Bold)) {
+                withStyle(style = SpanStyle(color = Redish, fontWeight = FontWeight.Bold)) {
                     append("Facilities")
                 }
             },
             fontSize = 24.sp,
             fontFamily = FontFamily(Font(R.font.poppins_semi_bold))
         )
-
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -401,6 +498,7 @@ fun ExploreFacilitiesSection(facilities: List<PosterItem>) {
                         .width(145.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(Color.White)
+                        .clickable { onCardClick() }
                 ) {
                     Image(
                         painter = painterResource(id = facility.imageResId),
@@ -409,7 +507,7 @@ fun ExploreFacilitiesSection(facilities: List<PosterItem>) {
                         modifier = Modifier
                             .height(145.dp)
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
+                            .clip(RoundedCornerShape(8.dp))
                     )
 
                     Column(modifier = Modifier.padding(top = 2.dp)) {
@@ -432,6 +530,7 @@ fun ExploreFacilitiesSection(facilities: List<PosterItem>) {
                             color = Color(0xFF535353),
                             fontSize = 12.sp,
                             maxLines = 2,
+                            lineHeight = 15.sp,
                             overflow = TextOverflow.Ellipsis
                         )
                     }
@@ -441,8 +540,6 @@ fun ExploreFacilitiesSection(facilities: List<PosterItem>) {
     }
 }
 
-
-
 @Composable
 fun FacilityCard(
     facility: Facility,
@@ -450,35 +547,37 @@ fun FacilityCard(
     showRating: Boolean = true,
     showBookmark: Boolean = true,
     onBookmarkClick: ((Facility) -> Unit)? = null,
-    onCardClick: ((Facility) -> Unit)? = null,
+    onCardClick: () -> Unit ,
     cornerRadius: Dp = 12.dp,
     cardElevation: Dp = 4.dp,
-    fromTextColor : Color
+    fromTextColor: Color,
+    arrowColor: Color = Purple
 ) {
+    var isBookmarked by rememberSaveable { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable(enabled = onCardClick != null) { onCardClick?.invoke(facility) }
+            .clickable { onCardClick() }
     ) {
         Card(
             shape = RoundedCornerShape(cornerRadius),
             elevation = CardDefaults.cardElevation(defaultElevation = cardElevation),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(160.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .height(160.dp)) {
+
                 Image(
                     painter = painterResource(id = facility.imageResId),
-                    contentDescription = null,
+                    contentDescription = "Facility image",
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(160.dp)
+                    modifier = Modifier.fillMaxSize()
                 )
 
-                // Rating (if shown)
+                // Rating badge
                 if (showRating) {
                     Surface(
                         color = Color.White,
@@ -509,50 +608,57 @@ fun FacilityCard(
                     }
                 }
 
-                // Bookmark (always topEnd if shown)
+                // Bookmark icon
                 if (showBookmark) {
                     Icon(
                         painter = painterResource(
-                            id = if (facility.isBookmarked) R.drawable.select_bm else R.drawable.bookmark_
+                            id = if (isBookmarked) R.drawable.select_bm else R.drawable.bookmark_
                         ),
                         contentDescription = "Bookmark",
                         modifier = Modifier
                             .padding(8.dp)
                             .align(Alignment.TopEnd)
-                            .clickable { onBookmarkClick?.invoke(facility) },
+                            .clickable {
+                                isBookmarked = !isBookmarked
+                                onBookmarkClick?.invoke(facility)
+                            },
                         tint = Color.Unspecified
                     )
                 }
             }
-
         }
 
-        Column(modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
             FacilityTextHeading(facility.name)
-//            Spacer(modifier = Modifier.height(2.dp))
-            FacilityTitleText("Location : " , facility.location)
-//            Spacer(modifier = Modifier.height(2.dp))
-            FacilityTitleText("Services : " , facility.services)
-//            Spacer(modifier = Modifier.height(2.dp))
+            FacilityTitleText("Location : ", facility.location)
+            FacilityTitleText("Services : ", facility.services)
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "From : " +facility.price,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
-                    color = Color(0xFFEA5B60)
-                )
+                Row {
+                    Text(
+                        text = "From : ",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
+                        color = fromTextColor
+                    )
+                    Text(
+                        text = facility.price,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
+                        color = fromTextColor
+                    )
+                }
 
                 Icon(
                     painter = painterResource(R.drawable.arrow_ic),
                     contentDescription = "arrow icon",
-                    Modifier.wrapContentSize()
+                    tint = arrowColor
                 )
             }
         }
@@ -560,21 +666,19 @@ fun FacilityCard(
 }
 
 
-
-
 @Composable
 fun FeaturedProvidersSection(
     providers: List<Provider>,
     onProfileClick: (Provider) -> Unit,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier) {
+    Column(modifier = modifier) {
         Text(
             text = buildAnnotatedString {
                 withStyle(style = SpanStyle(color = Color.Black, fontWeight = FontWeight.Bold)) {
                     append("Featured ")
                 }
-                withStyle(style = SpanStyle(color = Readish, fontWeight = FontWeight.Bold)) {
+                withStyle(style = SpanStyle(color = Redish, fontWeight = FontWeight.Bold)) {
                     append("Providers")
                 }
             },
@@ -585,10 +689,10 @@ fun FeaturedProvidersSection(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        LazyColumn(
-            verticalArrangement = Arrangement.SpaceBetween
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(providers) { provider ->
+            providers.forEach { provider ->
                 ProviderCard(
                     provider = provider,
                     onProfileClick = { onProfileClick(provider) },
@@ -598,6 +702,7 @@ fun FeaturedProvidersSection(
         }
     }
 }
+
 
 @Composable
 fun ProviderCard(
@@ -718,6 +823,81 @@ fun InfoRow(label: String, value: String) {
     }
 }
 
+@Composable
+fun LockedCardContent(
+    onLoginClick: () -> Unit,
+    onSubscriptionClick: () -> Unit,
+    sessionManager: SessionManager
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(250.dp)
+            .padding(vertical = 10.dp),
+        shape = RoundedCornerShape(10.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            // Background image
+            Image(
+                painter = painterResource(id = R.drawable.blur_ic),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.matchParentSize()
+            )
+
+            // Foreground content
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable._lock_ic_suns),
+                    contentDescription = "Locked Icon",
+                    modifier = Modifier.wrapContentSize()
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = stringResource(
+                        id = if (sessionManager.isSkippedLogin())
+                            R.string.please_login_to_access_the_provider
+                        else
+                            R.string.please_Subscription
+                    ),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    textAlign = TextAlign.Center,
+                    fontFamily = FontFamily(Font(R.font.poppins))
+                )
+
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                SharpEdgeButton(modifier = Modifier, buttonText = stringResource(
+                    id = if (sessionManager.isSkippedLogin())
+                        R.string.login_now
+                    else
+                        R.string.subscription
+                ), onClickButton =
+                    if (sessionManager.isSkippedLogin())
+                        onLoginClick
+                    else
+                        onSubscriptionClick
+                )
+            }
+        }
+    }
+}
+
+
 
 
 
@@ -725,7 +905,9 @@ fun InfoRow(label: String, value: String) {
 @Composable
 fun HomeScreenPreview() {
     val navController = rememberNavController()
+    val authNavController = rememberNavController()
+
     MaterialTheme {
-        HomeScreen(navController = navController)
+        HomeScreen(authNavController = authNavController, navController = navController, onOpenDrawer = {})
     }
 }

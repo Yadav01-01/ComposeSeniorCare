@@ -47,13 +47,14 @@ import com.bussiness.composeseniorcare.ui.component.SubmitButton
 import com.bussiness.composeseniorcare.ui.theme.BackColor
 import com.bussiness.composeseniorcare.ui.theme.Poppins
 import com.bussiness.composeseniorcare.ui.theme.Purple
+import com.bussiness.composeseniorcare.util.ErrorMessage
 
 @Composable
 fun VerifyOTP(
     navController: NavHostController,
-    onSubmitClick: () -> Unit = { navController.navigate(Routes.CREATE_PASSWORD) },
-    ) {
+) {
     var otp by remember { mutableStateOf("") }
+    var showError by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -89,7 +90,7 @@ fun VerifyOTP(
                     .fillMaxSize()
                     .padding(horizontal = 20.dp)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Top,
+                verticalArrangement = Arrangement.Top,
             ) {
                 Text(
                     text = "Verify Your Account",
@@ -133,16 +134,21 @@ fun VerifyOTP(
 
                 Spacer(modifier = Modifier.height(5.dp))
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clickable { /* To dismiss keyboard */ },
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    OtpInputField(
-                        otpText = otp,
-                        onOtpTextChange = { otp = it }
+                // ✅ Make sure your OtpInputField has proper width/focus support
+                OtpInputField(
+                    otpText = otp,
+                    onOtpTextChange = { otp = it },
+                )
+
+                if (showError) {
+                    Text(
+                        text = ErrorMessage.INLINE_ERROR_EMAIL,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontFamily = Poppins,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.Red,
+                            fontSize = 12.sp
+                        )
                     )
                 }
 
@@ -161,7 +167,7 @@ fun VerifyOTP(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Normal,
                         color = Color.Black,
-                        modifier = Modifier.clickable { onSubmitClick() }
+                        modifier = Modifier.clickable {  }
                     )
 
                     Text(
@@ -175,11 +181,20 @@ fun VerifyOTP(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                SubmitButton(text = "Verify OTP", onClick = onSubmitClick, modifier = Modifier)
-
+                SubmitButton(
+                    text = "Verify OTP",
+                    onClick = {
+                        if (otp.length == 6 && otp.isNotBlank()){
+                            navController.navigate(Routes.CREATE_PASSWORD)
+                            showError = false
+                        }else{
+                            showError = true
+                        }
+                         },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
-
     }
 }
 
@@ -190,7 +205,7 @@ fun VerifyOTPPreview() {
     MaterialTheme {
         VerifyOTP (
             navController =navController,
-            onSubmitClick = {},
+
         )
     }
 }

@@ -3,7 +3,7 @@ package com.bussiness.composeseniorcare.ui.screen.authflow
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement.Top
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -34,31 +34,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.bussiness.composeseniorcare.R
-import com.bussiness.composeseniorcare.ui.component.EmailOrPhoneInput
+import com.bussiness.composeseniorcare.navigation.Routes
 import com.bussiness.composeseniorcare.ui.component.HeadingText
 import com.bussiness.composeseniorcare.ui.component.PasswordInput
 import com.bussiness.composeseniorcare.ui.component.SubmitButton
 import com.bussiness.composeseniorcare.ui.theme.BackColor
 import com.bussiness.composeseniorcare.ui.theme.Poppins
 import com.bussiness.composeseniorcare.ui.theme.Purple
+import com.bussiness.composeseniorcare.util.ErrorMessage
 
 @Composable
-fun CreatePasswordScreen(
-    navController: NavHostController? = null,
-    onLoginClick: () -> Unit,
-    onSignUpClick: () -> Unit,
-
-    ) {
-    var input by remember { mutableStateOf("") }
+fun CreatePasswordScreen(navController: NavHostController) {
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    val errorMessage = remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFEAEFF1))
     ) {
-        // Top image
+        // Top Image
         Image(
             painter = painterResource(id = R.drawable.image_3),
             contentDescription = "House Image",
@@ -68,38 +66,34 @@ fun CreatePasswordScreen(
             contentScale = ContentScale.FillBounds
         )
 
-        // Overlapping Bottom Box
+        // Bottom Card
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.62f)
                 .align(Alignment.BottomCenter)
                 .clip(RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp))
-                .border(
-                    width = 2.dp,
-                    color = Color(0xFF5A2A60),
-                    shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
-                )
-                .background(color = BackColor)
+                .border(2.dp, Purple, RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp))
+                .background(BackColor)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 20.dp)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Top,
+                verticalArrangement = Arrangement.Top
             ) {
+                Spacer(modifier = Modifier.height(30.dp))
+
                 Text(
                     text = "Create a New Password",
-                    modifier = Modifier
-                        .padding(top = 30.dp)
-                        .align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.headlineSmall.copy(
                         fontFamily = Poppins,
                         fontWeight = FontWeight.Bold,
                         color = Purple,
                         textAlign = TextAlign.Center
-                    )
+                    ),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -108,7 +102,6 @@ fun CreatePasswordScreen(
                     text = "Your new password should be secure and\n easy to remember. Please enter and\n confirm your new password below.",
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontFamily = Poppins,
-                        fontWeight = FontWeight.Normal,
                         fontSize = 14.sp,
                         color = Color(0xFF808080),
                         textAlign = TextAlign.Center
@@ -119,41 +112,56 @@ fun CreatePasswordScreen(
                 Spacer(modifier = Modifier.height(25.dp))
 
                 HeadingText(text = "New Password")
-
                 Spacer(modifier = Modifier.height(8.dp))
-
-                EmailOrPhoneInput(
-                    value = input,
-                    onValueChange = {input = it}
-                )
-
-                Spacer(modifier = Modifier.height(15.dp))
-
-                HeadingText(text = "Confirm Password")
-
-                Spacer(modifier = Modifier.height(8.dp))
-
                 PasswordInput(password = password, onPasswordChange = { password = it })
+                Spacer(modifier = Modifier.height(15.dp))
+                HeadingText(text = "Confirm Password")
+                Spacer(modifier = Modifier.height(8.dp))
+                PasswordInput(password = confirmPassword, onPasswordChange = { confirmPassword = it })
+
+                if (errorMessage.value.isNotEmpty()) {
+                    Text(
+                        text = errorMessage.value,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.align(Alignment.Start)
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                SubmitButton(text = "Submit", onClick = onLoginClick, modifier = Modifier)
+                SubmitButton(
+                    text = "Submit",
+                    onClick = {
+                        val error = validatePasswords(password, confirmPassword)
+                        if (error != null) {
+                            errorMessage.value = error
+                            return@SubmitButton
+                        }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                        // Proceed to login screen
+                        errorMessage.value = ""
+                        navController.navigate(Routes.LOGIN)
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
             }
         }
-
     }
+}
+
+fun validatePasswords(password: String, confirmPassword: String): String? {
+    if (password.isBlank() || confirmPassword.isBlank()) return ErrorMessage.EMPTY_PASSWORD
+    if (password != confirmPassword) return ErrorMessage.MATCH_PASSWORD
+    return null
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun CreatePasswordScreenPreview() {
+    val navController = rememberNavController()
     MaterialTheme {
-        CreatePasswordScreen (
-            onLoginClick = {},
-            onSignUpClick = {}
-        )
+        CreatePasswordScreen(navController = navController)
     }
 }
-

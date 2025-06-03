@@ -1,5 +1,6 @@
 package com.bussiness.composeseniorcare.ui.screen.authflow
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -39,6 +41,8 @@ import com.bussiness.composeseniorcare.ui.component.SubmitButton
 import com.bussiness.composeseniorcare.ui.theme.BackColor
 import com.bussiness.composeseniorcare.ui.theme.Poppins
 import com.bussiness.composeseniorcare.ui.theme.Purple
+import com.bussiness.composeseniorcare.util.ErrorMessage
+import com.bussiness.composeseniorcare.util.SessionManager
 
 @Composable
 fun LoginScreen(
@@ -51,6 +55,11 @@ fun LoginScreen(
     var input by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showSuccessDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val sessionManager = remember { SessionManager(context) }
+    var emailError by remember { mutableStateOf(false) }
+    var passwordError by remember { mutableStateOf(false) }
+
 
     Box(
         modifier = Modifier
@@ -87,9 +96,13 @@ fun LoginScreen(
             contentDescription = "Skip Button",
             modifier = Modifier
                 .background(Color.Transparent, shape = CircleShape)
-                .padding(horizontal = 12.dp, vertical = 25.dp)
+                .padding(horizontal = 12.dp, vertical = 35.dp)
                 .align(Alignment.TopStart)
-                .clickable { /* Implement skip logic if needed */ },
+                .clickable {
+                    sessionManager.setSkipLogin(true)
+                    sessionManager.setLogin(false)
+                    navController.navigate(Routes.MAIN_SCREEN)
+                }
         )
 
         // Overlapping Bottom Box
@@ -188,13 +201,21 @@ fun LoginScreen(
                 SubmitButton(
                     text = "Login",
                     onClick = {
-                        if (input.isNotBlank() && password.isNotBlank()) {
+                        emailError = input.isBlank()
+                        passwordError = password.isBlank()
+
+                        if (!emailError && !passwordError) {
                             showSuccessDialog = true
                             onLoginClick()
+                            sessionManager.setLogin(true)
+                            sessionManager.setSkipLogin(false)
+                        }else {
+                            Toast.makeText(context, ErrorMessage.EMPTY_FIELD, Toast.LENGTH_SHORT).show()
                         }
                     },
                     modifier = Modifier
                 )
+
 
 
                 Spacer(modifier = Modifier.height(10.dp))

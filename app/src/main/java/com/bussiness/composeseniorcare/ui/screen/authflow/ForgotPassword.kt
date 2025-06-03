@@ -42,14 +42,14 @@ import com.bussiness.composeseniorcare.ui.component.SubmitButton
 import com.bussiness.composeseniorcare.ui.theme.BackColor
 import com.bussiness.composeseniorcare.ui.theme.Poppins
 import com.bussiness.composeseniorcare.ui.theme.Purple
+import com.bussiness.composeseniorcare.util.ErrorMessage
 
 @Composable
 fun ForgotPasswordScreen(
     navController: NavHostController,
-    onSubmitClick: () -> Unit = { navController.navigate(Routes.VERIFY_OTP) },
-
     ) {
     var input by remember { mutableStateOf("") }
+    var showError by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -103,7 +103,7 @@ fun ForgotPasswordScreen(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
-                    text = "Please enter your Email/Phone Number to\n get a verification code",
+                    text = "Please enter your Email/Phone Number to\n get a verification code.",
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontFamily = Poppins,
                         fontWeight = FontWeight.Normal,
@@ -133,10 +133,29 @@ fun ForgotPasswordScreen(
                     value = input,
                     onValueChange = {input = it}
                 )
+                if (showError) {
+                    Text(
+                        text = ErrorMessage.INLINE_ERROR_EMAIL,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontFamily = Poppins,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.Red,
+                            fontSize = 12.sp
+                        )
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(25.dp))
 
-                SubmitButton(text = "Send Code", onClick = onSubmitClick, modifier = Modifier)
+                SubmitButton(text = "Send Code", onClick = {
+                    if (input.isNotBlank()) {
+                        showError = false
+                        navController.navigate(Routes.VERIFY_OTP)
+                    } else {
+                        showError = true
+                    }
+                })
+
 
             }
         }
@@ -150,8 +169,7 @@ fun ForgotPasswordScreenPreview() {
     val navController = rememberNavController() // from androidx.navigation.compose
     MaterialTheme {
         ForgotPasswordScreen(
-            navController = navController,
-            onSubmitClick = {}
+            navController = navController
         )
     }
 }

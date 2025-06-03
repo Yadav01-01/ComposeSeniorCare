@@ -15,4 +15,20 @@
     <string name="amenities">Amenities</string>
     <string name="saved_featured_facilities"><font color="#000000">Saved Featured</font> <font color="#EA5B60">Facilities</font></string>
     <string name="_under_line_fetaure_fac"><u>Featured Facilities</u></string>
+    <string name="request_to_delete_account">Request to delete account</string>
+    <string name="request_to_closure_of_your_account">Request to closure of your account</string>
+    <string name="call_us_on">call us on</string>
+    <string name="mail_us">Mail Us</string>
+    <string name="please_login_to_access_the_provider">Please Login to access the Provider</string>
+    <string name="please_Subscription">You do not have enough credits.\n Please purchase a subscription plan\n to access more provider information.</string>
+    <string name="login_now">Login Now</string>
+    <string name="subscription">Subscription plan </string>
+    <string name="filter">Filter</string>
+    <string name="type">Type</string>
+    <string name="facility">Facility</string>
+    <string name="price_range_from_5000_to_100000">Price range from</string>
+    <string name="rooms">Rooms:</string>
+    <string name="city">city:</string>
+    <string name="to">to</string>
+    <string name="submit">Submit</string>
 </resources>

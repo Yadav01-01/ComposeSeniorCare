@@ -24,17 +24,35 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -43,14 +61,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bussiness.composeseniorcare.R
-import com.bussiness.composeseniorcare.ui.theme.BackColor
 import com.bussiness.composeseniorcare.ui.theme.Poppins
 import com.bussiness.composeseniorcare.ui.theme.Purple
+import com.bussiness.composeseniorcare.ui.theme.Redish
 import com.bussiness.composeseniorcare.util.ErrorMessage
-
 
 
 @Composable
@@ -68,59 +86,73 @@ fun EmailOrPhoneInput(
         return isEmail || isPhone
     }
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(40.dp)
-            .background(color = Color(0xFFE8F4F4), shape = RoundedCornerShape(12.dp))
-            .border(
-                width = 1.dp,
-                color = if (isError) MaterialTheme.colorScheme.error else Color(0xFFD0D0D0),
-                shape = RoundedCornerShape(12.dp)
-            )
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                painter = painterResource(id = R.drawable.mail_svg),
-                contentDescription = null,
-                tint = Color(0xFF9E9E9E),
-                modifier = Modifier.size(20.dp)
-            )
+    Column(modifier = modifier) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp)
+                .background(color = Color(0xFFE8F4F4), shape = RoundedCornerShape(12.dp))
+                .border(
+                    width = 1.dp,
+                    color = if (isError) MaterialTheme.colorScheme.error else Color(0xFFD0D0D0),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    painter = painterResource(id = R.drawable.mail_icon),
+                    contentDescription = null,
+                    tint = Color(0xFF9E9E9E),
+                    modifier = Modifier.size(20.dp)
+                )
 
-            Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(12.dp))
 
-            BasicTextField(
-                value = value,
-                onValueChange = {
-                    onValueChange(it)
-                    isError = !validate(it) && it.isNotEmpty()
-                },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Done
-                ),
-                textStyle = LocalTextStyle.current.copy(
-                    color = Color.Black,
-                    fontSize = 16.sp
-                ),
-                decorationBox = { innerTextField ->
-                    if (value.isEmpty()) {
-                        Text(
-                            text = placeholder,
-                            color = Color(0xFF9E9E9E),
-                            fontSize = 16.sp
-                        )
-                    }
-                    innerTextField()
-                },
-                modifier = Modifier.fillMaxWidth()
+                BasicTextField(
+                    value = value,
+                    onValueChange = {
+                        onValueChange(it)
+                        isError = !validate(it) && it.isNotEmpty()
+                    },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Done
+                    ),
+                    textStyle = LocalTextStyle.current.copy(
+                        color = Color.Black,
+                        fontSize = 16.sp
+                    ),
+                    decorationBox = { innerTextField ->
+                        if (value.isEmpty()) {
+                            Text(
+                                text = placeholder,
+                                color = Color(0xFF9E9E9E),
+                                fontSize = 16.sp
+                            )
+                        }
+                        innerTextField()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+
+        // Inline error message
+        if (isError) {
+            Text(
+                text = ErrorMessage.INLINE_ERROR_EMAIL,
+                color = MaterialTheme.colorScheme.error,
+                fontSize = 12.sp,
+                modifier = Modifier
+                    .padding(start = 8.dp, top = 4.dp)
             )
         }
     }
 }
+
 
 
 
@@ -217,10 +249,13 @@ fun PasswordInput(
 
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(
-                        imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                        painter = painterResource(
+                            id = if (passwordVisible) R.drawable.eye_ic else R.drawable.close_eye
+                        ),
                         contentDescription = if (passwordVisible) "Hide password" else "Show password",
                         tint = Color.Black
                     )
+
                 }
             }
         }
@@ -260,8 +295,37 @@ fun SubmitButton(
         Text(
             text = text,
             fontWeight = FontWeight.Bold,
-            fontSize = 16.sp,
+            fontSize = fontSize.sp,
             fontFamily = FontFamily(Font(R.font.poppins)),
+        )
+    }
+}
+
+@Composable
+fun SubmitButtonSharp(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = Purple,
+    textColor: Color = Color.White,
+    fontSize: Int = 16
+) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = backgroundColor,
+            contentColor = textColor
+        ),
+        shape = RoundedCornerShape(5.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(45.dp)
+    ) {
+        Text(
+            text = text,
+            fontWeight = FontWeight.Bold,
+            fontSize = fontSize.sp,
+            fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
         )
     }
 }
@@ -277,7 +341,7 @@ fun GoogleButtonWithIcon(
 ) {
     OutlinedButton(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth().height(50.dp),
+        modifier = modifier.fillMaxWidth().height(50.dp).background(color = Color(0xFFE6F3F2)),
         border = BorderStroke(1.dp, borderColor),
         colors = ButtonDefaults.outlinedButtonColors(
             containerColor = Color.Transparent,
@@ -307,50 +371,63 @@ fun OtpInputField(
     otpText: String,
     onOtpTextChange: (String) -> Unit
 ) {
-    Row(
+    val focusRequester = remember { FocusRequester() }
+
+    // Main clickable row that requests focus when clicked
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
+            .padding(16.dp)
+            .clickable {
+                focusRequester.requestFocus()
+            },
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        repeat(6) { index ->
-            val char = otpText.getOrNull(index)?.toString() ?: ""
-            Box(
-                modifier = Modifier
-                    .height(40.dp)
-                    .width(45.dp)
-                    .border(
-                        width = 2.dp,
-                        color = Color(0xFFD0D0D0),
-                        shape = RoundedCornerShape(8.dp)
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            repeat(6) { index ->
+                val char = otpText.getOrNull(index)?.toString() ?: ""
+                Box(
+                    modifier = Modifier
+                        .height(50.dp)
+                        .width(45.dp)
+                        .border(
+                            width = 2.dp,
+                            color = Color(0xFFD0D0D0),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .background(Color(0xFFE6F3F2), shape = RoundedCornerShape(10.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = char,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
                     )
-                    .background(Color(0xFFE6F3F2), shape = RoundedCornerShape(10.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = char,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                }
             }
         }
-    }
 
-    // Hidden input field to capture text
-    BasicTextField(
-        value = otpText,
-        onValueChange = {
-            if (it.length <= 6 && it.all { char -> char.isDigit() }) {
-                onOtpTextChange(it)
-            }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(2.dp) // practically invisible
-            .alpha(0f) // fully transparent
-            .focusable()
-    )
+        // Hidden BasicTextField to actually handle the input
+        BasicTextField(
+            value = otpText,
+            onValueChange = {
+                if (it.length <= 6 && it.all { char -> char.isDigit() }) {
+                    onOtpTextChange(it)
+                }
+            },
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .alpha(0f)
+                .fillMaxWidth()
+                .height(1.dp)
+                .focusable()
+        )
+    }
 }
+
 
 @Composable
 fun CompareFacilityCard(
@@ -402,10 +479,10 @@ fun CompareFacilityCard(
 
 
 @Composable
-fun SharpEdgeButton(buttonText : String, onClickButton : () -> Unit,buttonTextSize : Int = 12){
+fun SharpEdgeButton(modifier: Modifier = Modifier,buttonText : String, onClickButton : () -> Unit,buttonTextSize : Int = 12){
     Button(
         onClick = onClickButton,
-        modifier = Modifier
+        modifier = modifier
             .height(35.dp)
             .padding(start = 9.dp, end = 9.dp),
         colors = ButtonDefaults.buttonColors(
@@ -436,7 +513,8 @@ fun TopHeadingText(
             .fillMaxWidth()
             .background(Color.Transparent)
             .wrapContentHeight()
-            .padding(vertical = 12.dp, horizontal = 16.dp),
+            .padding(vertical = 25.dp, horizontal = 16.dp)
+            .padding(top = 10.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -464,4 +542,98 @@ fun TopHeadingText(
 }
 
 
+@Composable
+fun LongMessageTextBox(
+    value: String,
+    onValueChange: (String) -> Unit,
+    hint: String,
+    modifier: Modifier = Modifier
+) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        placeholder = {
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = Color(0xFF333333), fontWeight = FontWeight.Normal)) {
+                        append(hint)
+                    }
+                    withStyle(style = SpanStyle(color = Redish, fontWeight = FontWeight.Bold)) {
+                        append("*")
+                    }
+                },
+                color = Color(0xFF333333),
+                fontFamily = FontFamily(Font(R.font.poppins)),
+                fontSize = 14.sp
+            )
+        },
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = 5.dp)
+            .height(100.dp) // Increase height for message box
+            .background(
+                color = Color(0xFFE6F3F2),
+                shape = RoundedCornerShape(8.dp)
+            )
+            .clip(RoundedCornerShape(8.dp)),
+        colors = TextFieldDefaults.colors(
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            cursorColor = Color.Black
+        ),
+        textStyle = TextStyle(
+            color = Color.Black,
+            fontFamily = FontFamily(Font(R.font.poppins)),
+            fontSize = 14.sp
+        ),
+        shape = RoundedCornerShape(8.dp),
+        singleLine = false,
+         // Allow multiline input for feedback
+    )
+}
 
+@Composable
+fun SkippedFormat( onLoginClick: () -> Unit,onSignUpClick: () -> Unit ){
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        Button(
+            onClick = onLoginClick,
+            modifier = Modifier
+                .weight(1f)
+                .height(40.dp),
+            shape = RoundedCornerShape(3.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Purple,
+                contentColor = Color.White
+            )
+        ) {
+            Text(
+                text = "Log In",
+                fontSize = 14.sp,
+                fontFamily = FontFamily(Font(R.font.poppins)),
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Button(
+            onClick = onSignUpClick,
+            modifier = Modifier
+                .weight(1f)
+                .height(40.dp),
+            shape = RoundedCornerShape(3.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Purple,
+                contentColor = Color.White
+            )
+        ) {
+            Text(
+                text = "Sign Up",
+                fontSize = 14.sp,
+                fontFamily = FontFamily(Font(R.font.poppins)),
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}

@@ -14,6 +14,14 @@ object Routes {
     const val PROFILE_SCREEN = "ProfileScreen"
     const val MAIN_SCREEN = "MainScreen"
     const val FACILITY_LISTING = "FacilityListing"
+    const val FACILITY_LISTING_WITH_ARG = "$FACILITY_LISTING/{type}"
     const val LISTING_DETAIL = "FacilityDetail"
+    const val ABOUT_US = "AboutUs"
+    const val SERVICES = "Services"
+    const val SUBSCRIPTIONS = "Subscriptions"
+    const val CONTACTUS = "Contactus"
+    const val PRIVACY = "Privacy"
+    const val FAQ = "FAQ"
+    const val DELETE_ACCOUNT = "DeleteAccount"
 
 }

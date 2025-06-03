@@ -20,13 +20,15 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,13 +49,20 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.bussiness.composeseniorcare.R
-import com.bussiness.composeseniorcare.data.model.Facility
+import com.bussiness.composeseniorcare.navigation.Routes
+import com.bussiness.composeseniorcare.ui.component.FilterDialog
 import com.bussiness.composeseniorcare.ui.component.SharpEdgeButton
-import com.bussiness.composeseniorcare.ui.theme.Purple
-import com.bussiness.composeseniorcare.ui.theme.Readish
+import com.bussiness.composeseniorcare.ui.theme.Redish
+
 
 @Composable
-fun FacilityListing(navController: NavHostController) {
+fun FacilityListing(navController: NavHostController, onOpenDrawer: () -> Unit,type : String) {
+
+    var showDialog by remember { mutableStateOf(false) }
+    var priceRange by remember { mutableStateOf(5000f..100000f) }
+    val amenities = listOf("WiFi", "Parking", "Gym", "Pool", "Spa", "Laundry")
+    var selectedAmenities by remember { mutableStateOf(setOf<String>()) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -67,7 +76,7 @@ fun FacilityListing(navController: NavHostController) {
                 )
             )
     ) {
-        CustomTopAppBar(showCredit = false)
+        CustomTopAppBar(showCredit = false,onOpenDrawer)
 
         Box(
             modifier = Modifier
@@ -84,10 +93,32 @@ fun FacilityListing(navController: NavHostController) {
             ) {
                 item {
                     Spacer(modifier = Modifier.height(20.dp))
-                    SearchBarWithFilter(onClickFilter = { }, onClickSearch = { })
+                    SearchBarWithFilter(onClickFilter = { showDialog = true }, onClickSearch = { })
+                    if (showDialog) {
+                        FilterDialog(
+                            onDismiss = { showDialog = false },
+                            onSubmit = {
+                                // Do your API/filter logic here
+                                showDialog = false
+                            },
+                            minPrice = 5000f,
+                            maxPrice = 100000f,
+                            priceRange = priceRange,
+                            onPriceChange = { priceRange = it },
+                            amenities = amenities,
+                            selectedAmenities = selectedAmenities,
+                            onAmenityToggle = {
+                                selectedAmenities = if (selectedAmenities.contains(it)) {
+                                    selectedAmenities - it
+                                } else {
+                                    selectedAmenities + it
+                                }
+                            }
+                        )
+                    }
                     Spacer(modifier = Modifier.height(15.dp))
                     MapBox()
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(5.dp))
                     Text(
                         "Facilities",
                         fontSize = 24.sp,
@@ -95,7 +126,7 @@ fun FacilityListing(navController: NavHostController) {
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFFEA5B60)
                     )
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(5.dp))
                 }
 
                 items(facilitiesList) { facility ->
@@ -104,8 +135,15 @@ fun FacilityListing(navController: NavHostController) {
                         showRating = true,
                         showBookmark = true,
                         onBookmarkClick = { },
-                        onCardClick = { },
-                        fromTextColor = Color(0xFFEA5B60)
+                        onCardClick = {
+                            if (type == "compare"){
+                                navController.navigate(Routes.COMPARE_FACILITY)
+                            }else{
+                                navController.navigate(Routes.LISTING_DETAIL)
+                            }
+                        },
+                        fromTextColor = Color(0xFFEA5B60),
+                        arrowColor = Redish
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                 }
@@ -115,13 +153,13 @@ fun FacilityListing(navController: NavHostController) {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(5.dp))
 
                         Text(text = buildAnnotatedString {
                             withStyle(style = SpanStyle(color = Color.Black, fontWeight = FontWeight.Bold)) {
                                 append("Exclusive ")
                             }
-                            withStyle(style = SpanStyle(color = Readish, fontWeight = FontWeight.Bold)) {
+                            withStyle(style = SpanStyle(color = Redish, fontWeight = FontWeight.Bold)) {
                                 append("Offers")
                             }
                         },
@@ -144,7 +182,7 @@ fun FacilityListing(navController: NavHostController) {
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        SharpEdgeButton("Join Now !", onClickButton = { }, buttonTextSize = 14)
+                        SharpEdgeButton(modifier = Modifier,"Join Now !", onClickButton = { navController.navigate(Routes.SUBSCRIPTIONS) }, buttonTextSize = 14)
 
                         Spacer(modifier = Modifier.height(20.dp))
                     }
@@ -162,7 +200,6 @@ fun SearchBarWithFilter(
     onClickSearch: () -> Unit) {
     Row(
         modifier = Modifier
-            .padding(top = 20.dp)
             .fillMaxWidth()
             .height(48.dp)
             .clip(RoundedCornerShape(10.dp))
@@ -238,10 +275,6 @@ fun MapBox(){
     }
 }
 
-
-
-
-
 @Preview(showBackground = true)
 @Composable
 fun FacilityListingPreview() {
@@ -249,6 +282,8 @@ fun FacilityListingPreview() {
     MaterialTheme {
         FacilityListing(
             navController = navController,
+            onOpenDrawer = {},
+            type = ""
         )
     }
 }

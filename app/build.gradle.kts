@@ -72,6 +72,10 @@ dependencies {
     implementation (libs.accompanist.pager.v0360)
     implementation (libs.accompanist.pager.indicators.v0360)
 
+    implementation (libs.androidx.material) // For legacy components like RangeSlider
+
+
+
 
 
 
