@@ -76,6 +76,7 @@ fun MainScreen(authNavController: NavHostController) {
 
     ModalDrawer(
         drawerState = drawerState,
+        gesturesEnabled = false,
         drawerContent = {
             DrawerContent(
                 drawerState = drawerState,
@@ -137,17 +138,13 @@ fun MainScreen(authNavController: NavHostController) {
                                     launchSingleTop = true
                                 }
                             } else {
-                                if (currentRoute != item.route) {
-                                    navController.navigate(item.route) {
-                                        popUpTo(navController.graph.startDestinationId) {
-                                            saveState = true
-                                        }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
+                                navController.navigate(item.route) {
+                                    popUpTo(0) { inclusive = true } //  clear entire back stack
+                                    launchSingleTop = true          // avoid duplicate
                                 }
                             }
                         }
+
                     )
 
                 }

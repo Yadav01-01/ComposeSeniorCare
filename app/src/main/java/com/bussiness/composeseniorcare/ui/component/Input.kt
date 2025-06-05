@@ -507,26 +507,24 @@ fun TopHeadingText(
     modifier: Modifier = Modifier,
     onBackPress: () -> Unit
 ) {
-    Spacer(Modifier.height(10.dp))
-    Row(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.Transparent)
             .wrapContentHeight()
             .padding(vertical = 25.dp, horizontal = 16.dp)
-            .padding(top = 10.dp, bottom = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
     ) {
+        // Back icon aligned start (left)
         Icon(
             painter = painterResource(id = R.drawable.back_ic),
             contentDescription = "Back icon",
             modifier = Modifier
-                .wrapContentSize()
+                .align(Alignment.CenterStart)
                 .clickable { onBackPress() }
+                .wrapContentSize()
         )
 
-        Spacer(modifier = Modifier.width(16.dp))
-
+        // Title text centered absolutely
         Text(
             text = text,
             fontSize = 20.sp,
@@ -535,11 +533,19 @@ fun TopHeadingText(
             color = Color.Black,
             textAlign = TextAlign.Center,
             modifier = modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically)
+                .align(Alignment.Center)
+                .fillMaxWidth(0.7f) // limit width to avoid overflow
+        )
+
+        // Invisible box to balance the back icon on the right, same size as icon
+        Spacer(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .size(24.dp)
         )
     }
 }
+
 
 
 @Composable

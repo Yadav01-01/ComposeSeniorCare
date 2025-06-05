@@ -27,7 +27,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Card
@@ -141,7 +140,7 @@ fun HomeScreen(authNavController: NavHostController,navController: NavHostContro
                 .fillMaxSize()
                 .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
                 .background(Color.White)
-                .padding(horizontal = 15.dp, vertical = 15.dp),
+                .padding(horizontal = 15.dp),
             verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
             item { SearchBar() }
@@ -195,6 +194,23 @@ fun HomeScreen(authNavController: NavHostController,navController: NavHostContro
 
 
             item {
+
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(color = Color.Black, fontWeight = FontWeight.Bold)) {
+                            append("Featured ")
+                        }
+                        withStyle(style = SpanStyle(color = Redish, fontWeight = FontWeight.Bold)) {
+                            append("Providers")
+                        }
+                    },
+                    fontFamily = FontFamily(Font(R.font.poppins_bold)),
+                    fontSize = 24.sp,
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
                 if (isLockedVisible) {
                     LockedCardContent(
                         onLoginClick = {
@@ -233,7 +249,7 @@ fun CustomTopAppBar(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                top = statusBarPadding.calculateTopPadding(),
+                top = statusBarPadding.calculateTopPadding()+10.dp,
                 start = 16.dp,
                 end = 16.dp,
                 bottom = 15.dp
@@ -297,7 +313,7 @@ fun CreditsText(modifier: Modifier = Modifier) {
                 painter = painterResource(id = R.drawable.twemoji_coin),
                 contentDescription = null,
                 tint = Color.Unspecified,
-                modifier = Modifier.size(10.dp)
+                modifier = Modifier.wrapContentSize()
             )
 
             Spacer(modifier = Modifier.width(5.dp))
@@ -322,7 +338,7 @@ fun SearchBar() {
 
     Row(
         modifier = Modifier
-            .padding(top = 5.dp)
+            .padding(top = 15.dp)
             .fillMaxWidth()
             .height(48.dp)
             .clip(RoundedCornerShape(10.dp))
@@ -515,7 +531,7 @@ fun ExploreFacilitiesSection(facilities: List<PosterItem>,onCardClick: () -> Uni
                             text = facility.title,
                             fontWeight = FontWeight.SemiBold,
                             fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
-                            color = Color(0xFFD2265B),
+                            color = Purple,
                             fontSize = 14.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -673,21 +689,6 @@ fun FeaturedProvidersSection(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        Text(
-            text = buildAnnotatedString {
-                withStyle(style = SpanStyle(color = Color.Black, fontWeight = FontWeight.Bold)) {
-                    append("Featured ")
-                }
-                withStyle(style = SpanStyle(color = Redish, fontWeight = FontWeight.Bold)) {
-                    append("Providers")
-                }
-            },
-            fontFamily = FontFamily(Font(R.font.poppins_bold)),
-            fontSize = 24.sp,
-            color = Color.Black
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp)

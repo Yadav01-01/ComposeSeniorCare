@@ -60,7 +60,7 @@ fun CustomBottomBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             items.forEach { item ->

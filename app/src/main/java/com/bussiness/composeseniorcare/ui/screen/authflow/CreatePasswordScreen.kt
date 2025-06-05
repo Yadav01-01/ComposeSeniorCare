@@ -73,9 +73,27 @@ fun CreatePasswordScreen(navController: NavHostController) {
                 .fillMaxHeight(0.62f)
                 .align(Alignment.BottomCenter)
                 .clip(RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp))
-                .border(2.dp, Purple, RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp))
-                .background(BackColor)
         ) {
+            // Main box with border and background
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(color = BackColor, shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp))
+                    .border(
+                        width = 2.dp,
+                        color = Purple,
+                        shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
+                    )
+            )
+
+            // White overlay to hide bottom border (1dp height)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .align(Alignment.BottomCenter)
+                    .background(color = BackColor) // Use your actual background color
+            )
             Column(
                 modifier = Modifier
                     .fillMaxSize()

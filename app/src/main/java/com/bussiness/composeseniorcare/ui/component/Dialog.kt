@@ -76,7 +76,7 @@ fun LoginSuccessDialog(
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(24.dp)
+                    modifier = Modifier.padding(10.dp)
                 ) {
                     // Close icon
                     Image(
@@ -107,13 +107,13 @@ fun LoginSuccessDialog(
                         fontFamily = FontFamily(Font(R.font.poppins_semi_bold))
                     )
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
                     Button(
                         onClick = onOkayClick,
                         colors = ButtonDefaults.buttonColors(containerColor = Purple),
                         shape = RoundedCornerShape(6.dp),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 25.dp).padding(bottom = 20.dp)
                     ) {
                         Text("Okay", color = Color.White, fontSize = 14.sp,
                             fontFamily = FontFamily(Font(R.font.poppins_semi_bold)))
@@ -142,7 +142,7 @@ fun StatusDialog(
                 .padding(horizontal = 0.dp)
         ) {
             Surface(
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(10.dp),
                 color = Color.White,
                 shadowElevation = 8.dp,
                 modifier = Modifier
@@ -152,7 +152,7 @@ fun StatusDialog(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp)
+                        .padding( 8.dp)
                 ) {
                     // Close icon
                     Box(modifier = Modifier.fillMaxWidth()) {
@@ -188,10 +188,10 @@ fun StatusDialog(
                         fontFamily = FontFamily(Font(R.font.poppins_semi_bold)),
                         color = Color.Black,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp)
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     // Content
                     Text(
@@ -201,21 +201,21 @@ fun StatusDialog(
                         fontFamily = FontFamily(Font(R.font.open_sans)),
                         color = Color(0xFF4A4A4A),
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp)
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
 
                     // Buttons
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 20.dp),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Button(
                             onClick = onYesClick,
                             modifier = Modifier
                                 .weight(1f)
-                                .height(48.dp),
+                                .height(45.dp),
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Purple,
@@ -234,7 +234,7 @@ fun StatusDialog(
                             onClick = onNoClick,
                             modifier = Modifier
                                 .weight(1f)
-                                .height(48.dp),
+                                .height(45.dp),
                             shape = RoundedCornerShape(8.dp),
                             border = BorderStroke(1.dp, Purple),
                             colors = ButtonDefaults.outlinedButtonColors(
@@ -580,16 +580,15 @@ fun PreviewFilterDialog() {
     val selectedAmenities = remember { mutableStateOf(setOf<String>()) }
 
     if (open.value) {
-        FilterDialog(
+        StatusDialog(
             onDismiss = { open.value = false },
-            onSubmit = {},
-            priceRange = priceRange.value,
-            onPriceChange = { priceRange.value = it },
-            amenities = List(21) { "Amenities" },
-            selectedAmenities = selectedAmenities.value,
-            onAmenityToggle = {
-                selectedAmenities.value = selectedAmenities.value.toggle(it)
-            }
+            onYesClick = { open.value = false },
+            onNoClick = { open.value = false },
+            description = "Deleting your Account?",
+            content = "Are you sure you want to delete?",
+            icon = R.drawable.tick_ic,
+            lButtonText = "Delete",
+            rButtonText = "Cancel"
         )
     }
 }
