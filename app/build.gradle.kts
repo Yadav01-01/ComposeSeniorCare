@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     kotlin("kapt")
+    alias(libs.plugins.hilt)
+
 }
 
 
@@ -53,6 +55,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.animation.core.lint)
+    implementation(libs.firebase.appdistribution.gradle)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -75,17 +78,14 @@ dependencies {
     implementation (libs.accompanist.pager.indicators.v0360)
     //material
     implementation (libs.androidx.material) // For legacy components like RangeSlider
-    // Hilt Core (Latest stable)
-    implementation(libs.hilt.android.v2562)
-
-    // Hilt Navigation Compose
-    implementation(libs.androidx.hilt.navigation.compose)
-
+    // Hilt for DI
+    implementation (libs.hilt.android.v2562)
+    kapt (libs.hilt.compiler.v252)
+    implementation (libs.androidx.hilt.navigation.compose)
     // Retrofit + OkHttp
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
     implementation (libs.logging.interceptor)
-
     // Network monitoring
     implementation (libs.androidx.lifecycle.runtime.ktx.v291)
     implementation (libs.androidx.runtime.livedata)
