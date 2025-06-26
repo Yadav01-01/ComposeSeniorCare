@@ -2,9 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    kotlin("kapt")
-    alias(libs.plugins.hilt)
-
+    alias(libs.plugins.hilt)         //  plugin from toml
+    alias(libs.plugins.kotlin.kapt)  //  kapt plugin from toml
 }
 
 
@@ -41,8 +40,23 @@ android {
     buildFeatures {
         compose = true
     }
-}
+    packaging {
+        resources {
+            excludes += setOf(
+                "META-INF/INDEX.LIST",
+                "META-INF/DEPENDENCIES",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/license.txt",
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt",
+                "META-INF/ASL2.0",
+                "META-INF/io.netty.versions.properties" //  Add this new line
+            )
+        }
+    }
 
+}
 
 dependencies {
 
@@ -65,6 +79,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     //navigation
     implementation(libs.androidx.navigation.compose)
+
     implementation (libs.androidx.material.icons.extended)
     //material3
     implementation(libs.material3)
@@ -76,18 +91,33 @@ dependencies {
     // Pager (Accompanist)
     implementation (libs.accompanist.pager.v0360)
     implementation (libs.accompanist.pager.indicators.v0360)
-    //material
     implementation (libs.androidx.material) // For legacy components like RangeSlider
-    // Hilt for DI
-    implementation (libs.hilt.android.v2562)
-    kapt (libs.hilt.compiler.v252)
-    implementation (libs.androidx.hilt.navigation.compose)
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.51")
+    kapt("com.google.dagger:hilt-android-compiler:2.51")
+
+    // Optional: Hilt + Jetpack Compose
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    kapt("androidx.hilt:hilt-compiler:1.2.0")
+
     // Retrofit + OkHttp
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
     implementation (libs.logging.interceptor)
+
     // Network monitoring
     implementation (libs.androidx.lifecycle.runtime.ktx.v291)
     implementation (libs.androidx.runtime.livedata)
+
+
+
+
+
+
+
+
+
+
+
 
 }

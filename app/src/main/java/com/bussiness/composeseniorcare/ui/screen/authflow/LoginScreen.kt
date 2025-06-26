@@ -1,6 +1,10 @@
 package com.bussiness.composeseniorcare.ui.screen.authflow
 
+import android.app.Activity
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -59,6 +63,19 @@ fun LoginScreen(
     val sessionManager = remember { SessionManager(context) }
     var emailError by remember { mutableStateOf(false) }
     var passwordError by remember { mutableStateOf(false) }
+    var backPressedOnce by remember { mutableStateOf(false) }
+
+    BackHandler(true) {
+        if (backPressedOnce) {
+            (context as? Activity)?.finishAffinity()
+        } else {
+            backPressedOnce = true
+            Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
+            Handler(Looper.getMainLooper()).postDelayed({
+                backPressedOnce = false
+            }, 2000)
+        }
+    }
 
 
     Box(

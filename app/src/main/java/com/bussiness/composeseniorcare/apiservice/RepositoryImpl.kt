@@ -2,9 +2,9 @@ package com.bussiness.composeseniorcare.apiservice
 
 import com.bussiness.composeseniorcare.util.ErrorMessage
 import com.bussiness.composeseniorcare.util.UiState
-import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
 class RepositoryImpl @Inject constructor(
     private val api: ApiEndPoint

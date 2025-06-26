@@ -1,5 +1,10 @@
 package com.bussiness.composeseniorcare.ui.screen.mainflow
 
+import android.app.Activity
+import android.os.Handler
+import android.os.Looper
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -119,6 +124,20 @@ fun HomeScreen(authNavController: NavHostController,navController: NavHostContro
     val context = LocalContext.current
     val sessionManager = remember { SessionManager(context) }
     var isLockedVisible by remember { mutableStateOf(true) }
+    var backPressedOnce by remember { mutableStateOf(false) }
+
+
+    BackHandler(true) {
+        if (backPressedOnce) {
+            (context as? Activity)?.finishAffinity()
+        } else {
+            backPressedOnce = true
+            Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
+            Handler(Looper.getMainLooper()).postDelayed({
+                backPressedOnce = false
+            }, 2000)
+        }
+    }
 
     Column(
         modifier = Modifier
