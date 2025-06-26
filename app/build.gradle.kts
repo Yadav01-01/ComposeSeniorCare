@@ -51,7 +51,7 @@ android {
                 "META-INF/NOTICE",
                 "META-INF/NOTICE.txt",
                 "META-INF/ASL2.0",
-                "META-INF/io.netty.versions.properties" //  Add this new line
+                "META-INF/io.netty.versions.properties"
             )
         }
     }
@@ -93,12 +93,12 @@ dependencies {
     implementation (libs.accompanist.pager.indicators.v0360)
     implementation (libs.androidx.material) // For legacy components like RangeSlider
     // Hilt
-    implementation("com.google.dagger:hilt-android:2.51")
-    kapt("com.google.dagger:hilt-android-compiler:2.51")
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
 
     // Optional: Hilt + Jetpack Compose
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    kapt("androidx.hilt:hilt-compiler:1.2.0")
+    implementation(libs.androidx.hilt.navigation.compose)
+    kapt(libs.androidx.hilt.compiler)
 
     // Retrofit + OkHttp
     implementation (libs.retrofit)

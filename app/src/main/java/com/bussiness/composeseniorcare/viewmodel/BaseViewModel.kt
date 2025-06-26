@@ -5,6 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.bussiness.composeseniorcare.util.ErrorMessage
 import com.bussiness.composeseniorcare.util.NetworkUtils
 import com.bussiness.composeseniorcare.util.UiState
 import kotlinx.coroutines.launch
@@ -29,7 +30,7 @@ abstract class BaseViewModel<T>(
                 val result = request()
                 _uiState.value = UiState.Success(result)
             } catch (e: Exception) {
-                _uiState.value = UiState.Error(e.localizedMessage ?: "Something went wrong")
+                _uiState.value = UiState.Error(e.localizedMessage ?: ErrorMessage.CATCH_ERROR)
             }
         }
     }

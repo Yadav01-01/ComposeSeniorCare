@@ -115,7 +115,6 @@ fun MainScreen(authNavController: NavHostController) {
                     rButtonText = "No"
                 )
             }
-
         }
     ) {
         Scaffold(
@@ -175,13 +174,10 @@ fun MainScreen(authNavController: NavHostController) {
                     savedFacilities = savedFacilities,
                     onOpenDrawer = { scope.launch { drawerState.open() } }
                 )
-
             }
         }
     }
 }
-
-
 
 @Composable
 fun DrawerContent(

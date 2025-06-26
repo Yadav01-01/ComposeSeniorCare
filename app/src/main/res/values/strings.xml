@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Compose SeniorCare</string>
+    <string name="app_name">SeniorCare</string>
     <string name="feature_provider"><font color="#000000">Featured</font> <font color="#EA5B60">Providers</font></string>
     <string name="featured_facilities"><font color="#000000">Featured</font> <font color="#EA5B60">Facilities</font></string>
     <string name="explore_facilities"><font color="#000000">Explore</font> <font color="#EA5B60">Facilities</font></string>

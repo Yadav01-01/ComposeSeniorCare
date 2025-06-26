@@ -9,5 +9,6 @@ object ErrorMessage {
     const val EMPTY_PASSWORD = "Password cannot be empty"
     const val MATCH_PASSWORD = "Passwords do not match"
     const val EMPTY_FIELD = "Please fill all the fields"
+    const val CATCH_ERROR = "Something went wrong"
 
 }
