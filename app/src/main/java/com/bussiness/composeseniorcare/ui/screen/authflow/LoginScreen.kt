@@ -3,6 +3,7 @@ package com.bussiness.composeseniorcare.ui.screen.authflow
 import android.app.Activity
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -32,11 +33,15 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.bussiness.composeseniorcare.R
 import com.bussiness.composeseniorcare.navigation.Routes
+import com.bussiness.composeseniorcare.ui.component.AppLoader
 import com.bussiness.composeseniorcare.ui.component.EmailOrPhoneInput
+import com.bussiness.composeseniorcare.ui.component.ErrorDialog
 import com.bussiness.composeseniorcare.ui.component.GoogleButtonWithIcon
 import com.bussiness.composeseniorcare.ui.component.HeadingText
 import com.bussiness.composeseniorcare.ui.component.LoginSuccessDialog
@@ -47,15 +52,19 @@ import com.bussiness.composeseniorcare.ui.theme.Poppins
 import com.bussiness.composeseniorcare.ui.theme.Purple
 import com.bussiness.composeseniorcare.util.ErrorMessage
 import com.bussiness.composeseniorcare.util.SessionManager
+import com.bussiness.composeseniorcare.util.UiState
+import com.bussiness.composeseniorcare.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen(
     navController: NavHostController,
-    onLoginClick: () -> Unit = {},
-    onSignUpClick: () -> Unit = { navController?.navigate(Routes.SIGN_UP) },
-    onForgotPasswordClick: () -> Unit = { navController?.navigate(Routes.FORGOT_PASSWORD) },
+    onSignUpClick: () -> Unit = { navController.navigate(Routes.SIGN_UP) },
+    onForgotPasswordClick: () -> Unit = { navController.navigate(Routes.FORGOT_PASSWORD) },
     onGoogleLoginClick: () -> Unit = {},
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
+    val state = viewModel.uiState.value
+
     var input by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showSuccessDialog by remember { mutableStateOf(false) }
@@ -64,18 +73,67 @@ fun LoginScreen(
     var emailError by remember { mutableStateOf(false) }
     var passwordError by remember { mutableStateOf(false) }
     var backPressedOnce by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
     BackHandler(true) {
         if (backPressedOnce) {
             (context as? Activity)?.finishAffinity()
         } else {
             backPressedOnce = true
-            Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, ErrorMessage.BACK_PRESSED_ONCE, Toast.LENGTH_SHORT).show()
             Handler(Looper.getMainLooper()).postDelayed({
                 backPressedOnce = false
             }, 2000)
         }
     }
+
+    LaunchedEffect(state) {
+        when (state) {
+            is UiState.Success -> {
+                val response = state.data
+                val userId = response.data?.id ?: -1
+                val token = response.token ?: ""
+                val email = response.data?.email ?: ""
+
+                sessionManager.setLogin(true)
+                sessionManager.setSkipLogin(false)
+                sessionManager.saveUserId(userId)
+                sessionManager.setAuthToken(token)
+                sessionManager.saveInput(email)
+
+                showSuccessDialog = true
+                viewModel.resetState()
+            }
+
+            is UiState.Error -> {
+                errorMessage = state.message
+                showDialog = true
+                viewModel.resetState()
+            }
+
+            UiState.NoInternet -> {
+                errorMessage = ErrorMessage.NO_INTERNET
+                showDialog = true
+                viewModel.resetState()
+            }
+
+            else -> Unit
+        }
+    }
+
+    if (state is UiState.Loading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f))
+                .zIndex(1f), // to bring it on top if necessary
+            contentAlignment = Alignment.Center
+        ) {
+            AppLoader()
+        }
+    }
+
 
 
     Box(
@@ -93,6 +151,14 @@ fun LoginScreen(
                         popUpTo(Routes.LOGIN) { inclusive = true }
                     }
                 }
+            )
+        }
+
+        if (showDialog) {
+            ErrorDialog(
+                message = errorMessage,
+                onConfirm = { showDialog = false },
+                onDismiss = { showDialog = false }
             )
         }
 
@@ -236,10 +302,7 @@ fun LoginScreen(
                         passwordError = password.isBlank()
 
                         if (!emailError && !passwordError) {
-                            showSuccessDialog = true
-                            onLoginClick()
-                            sessionManager.setLogin(true)
-                            sessionManager.setSkipLogin(false)
+                            viewModel.login(input, password)
                         }else {
                             Toast.makeText(context, ErrorMessage.EMPTY_FIELD, Toast.LENGTH_SHORT).show()
                         }
@@ -333,7 +396,6 @@ fun LoginScreenPreview() {
     MaterialTheme {
         LoginScreen(
             navController = navController,
-            onLoginClick = {},
             onSignUpClick = {},
             onForgotPasswordClick = {},
             onGoogleLoginClick = {}

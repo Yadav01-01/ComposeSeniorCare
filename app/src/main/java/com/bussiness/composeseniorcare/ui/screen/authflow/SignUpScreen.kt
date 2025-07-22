@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,8 +26,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -36,35 +33,102 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.bussiness.composeseniorcare.R
 import com.bussiness.composeseniorcare.navigation.Routes
+import com.bussiness.composeseniorcare.ui.component.AppLoader
 import com.bussiness.composeseniorcare.ui.component.EmailOrPhoneInput
+import com.bussiness.composeseniorcare.ui.component.ErrorDialog
 import com.bussiness.composeseniorcare.ui.component.HeadingText
 import com.bussiness.composeseniorcare.ui.component.PasswordInput
 import com.bussiness.composeseniorcare.ui.component.SubmitButton
 import com.bussiness.composeseniorcare.ui.theme.BackColor
 import com.bussiness.composeseniorcare.ui.theme.Poppins
 import com.bussiness.composeseniorcare.ui.theme.Purple
+import com.bussiness.composeseniorcare.util.ErrorMessage
 import com.bussiness.composeseniorcare.util.SessionManager
+import com.bussiness.composeseniorcare.util.UiState
+import com.bussiness.composeseniorcare.viewmodel.RegisterViewModel
 
 @Composable
 fun SignUpScreen(
     navController: NavHostController,
     onLoginClick: () -> Unit = { navController.navigate(Routes.LOGIN) },
-    onRegisterClick: () -> Unit = { navController.navigate(Routes.MAIN_SCREEN) },
     onTermsClick: () -> Unit,
     onPrivacyClick: () -> Unit,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
 ) {
+
     var input by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
     val context = LocalContext.current
     val sessionManager = remember { SessionManager(context) }
+    val viewModel : RegisterViewModel =  hiltViewModel()
+    val state = viewModel.uiState.value
+
+    LaunchedEffect(state) {
+        when (state) {
+            is UiState.Success -> {
+                val response = state.data
+                val userId = response.data?.id ?: -1
+                val token = response.token ?: ""
+                val email = response.data?.email ?: ""
+
+                sessionManager.setLogin(true)
+                sessionManager.setSkipLogin(false)
+                sessionManager.saveUserId(userId)
+                sessionManager.setAuthToken(token)
+                sessionManager.saveInput(email)
+
+                navController.navigate(Routes.MAIN_SCREEN)
+
+                viewModel.resetState()
+            }
+
+            is UiState.Error -> {
+                errorMessage = state.message
+                showDialog = true
+                viewModel.resetState()
+            }
+
+            UiState.NoInternet -> {
+                errorMessage = ErrorMessage.NO_INTERNET
+                showDialog = true
+                viewModel.resetState()
+            }
+
+            else -> Unit
+        }
+    }
+
+    if (state is UiState.Loading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f))
+                .zIndex(1f), // to bring it on top if necessary
+            contentAlignment = Alignment.Center
+        ) {
+            AppLoader()
+        }
+    }
+
+
+    if (showDialog) {
+        ErrorDialog(
+            message = errorMessage,
+            onConfirm = { showDialog = false },
+            onDismiss = { showDialog = false }
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -106,7 +170,10 @@ fun SignUpScreen(
             Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .background(color = BackColor, shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp))
+                    .background(
+                        color = BackColor,
+                        shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
+                    )
                     .border(
                         width = 2.dp,
                         color = Purple,
@@ -158,19 +225,24 @@ fun SignUpScreen(
 
                 HeadingText(text = "Email/Phone Number")
                 Spacer(modifier = Modifier.height(8.dp))
-                EmailOrPhoneInput(value = input, onValueChange = { input = it })
+                EmailOrPhoneInput(value = input,
+                    onValueChange = { input = it }
+                )
 
                 Spacer(modifier = Modifier.height(15.dp))
 
                 HeadingText(text = "Password")
                 Spacer(modifier = Modifier.height(8.dp))
-                PasswordInput(password = password, onPasswordChange = { password = it })
+                PasswordInput(password = password,
+                    onPasswordChange = { password = it })
 
                 Spacer(modifier = Modifier.height(15.dp))
 
                 HeadingText(text = "Confirm Password")
                 Spacer(modifier = Modifier.height(8.dp))
-                PasswordInput(password = confirmPassword, onPasswordChange = { confirmPassword = it })
+                PasswordInput(password = confirmPassword,
+                    onPasswordChange = { confirmPassword = it }
+                )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -246,12 +318,11 @@ fun SignUpScreen(
                         if (message != null) {
                             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                         } else {
-                            onRegisterClick()
-                            sessionManager.setLogin(true)
-                            sessionManager.setSkipLogin(false)
+                            viewModel.register(input, confirmPassword)
                         }
                     }
                 )
+
 
                 Spacer(modifier = Modifier.height(15.dp))
 
@@ -283,6 +354,8 @@ fun SignUpScreen(
             }
         }
     }
+
+
 }
 
 

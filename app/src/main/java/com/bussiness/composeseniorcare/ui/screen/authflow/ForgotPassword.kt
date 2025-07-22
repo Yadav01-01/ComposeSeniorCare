@@ -1,5 +1,6 @@
 package com.bussiness.composeseniorcare.ui.screen.authflow
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,23 +35,80 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.bussiness.composeseniorcare.R
 import com.bussiness.composeseniorcare.navigation.Routes
+import com.bussiness.composeseniorcare.ui.component.AppLoader
 import com.bussiness.composeseniorcare.ui.component.EmailOrPhoneInput
+import com.bussiness.composeseniorcare.ui.component.ErrorDialog
 import com.bussiness.composeseniorcare.ui.component.SubmitButton
 import com.bussiness.composeseniorcare.ui.theme.BackColor
 import com.bussiness.composeseniorcare.ui.theme.Poppins
 import com.bussiness.composeseniorcare.ui.theme.Purple
 import com.bussiness.composeseniorcare.util.ErrorMessage
+import com.bussiness.composeseniorcare.util.UiState
+import com.bussiness.composeseniorcare.viewmodel.ForgotPasswordViewModel
 
 @Composable
 fun ForgotPasswordScreen(
     navController: NavHostController,
+    viewModel: ForgotPasswordViewModel = hiltViewModel()
     ) {
+
+    val state = viewModel.uiState.value
     var input by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+
+    LaunchedEffect(state) {
+        when (state) {
+            is UiState.Success -> {
+                navController.navigate("${Routes.VERIFY_OTP}/$input")
+                showDialog = false
+                viewModel.resetState()
+            }
+
+            is UiState.Error -> {
+                errorMessage = state.message
+                Log.d("FORGOT", "Error message: ${state.message}")
+                showDialog = true
+                viewModel.resetState()
+            }
+
+            UiState.NoInternet -> {
+                errorMessage = ErrorMessage.NO_INTERNET
+                showDialog = true
+                viewModel.resetState()
+            }
+
+            else -> Unit
+        }
+    }
+
+    if (showDialog) {
+        ErrorDialog(
+            message = errorMessage,
+            onConfirm = { showDialog = false },
+            onDismiss = { showDialog = false }
+        )
+    }
+
+    if (state is UiState.Loading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f))
+                .zIndex(1f), // to bring it on top if necessary
+            contentAlignment = Alignment.Center
+        ) {
+            AppLoader()
+        }
+    }
+
 
     Box(
         modifier = Modifier
@@ -164,7 +223,7 @@ fun ForgotPasswordScreen(
                 SubmitButton(text = "Send Code", onClick = {
                     if (input.isNotBlank()) {
                         showError = false
-                        navController.navigate(Routes.VERIFY_OTP)
+                        viewModel.forgotPasswordApi(input)
                     } else {
                         showError = true
                     }
